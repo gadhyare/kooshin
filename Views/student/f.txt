@@ -1,0 +1,139 @@
+<?php class StudentModel extends Model{
+    public  $rowss;
+    public function Index(){
+        
+
+    }
+
+    public function info(){
+        $this->query('SELECT *  from stu_info');
+        $rows = $this->resultSet();
+        return $rows;
+    }
+
+    public function update(){
+        $this->query('SELECT * FROM stu_info WHERE id=:id');
+        $this->bind(':id' ,  $_GET['id']);
+        $stu_info_select = $this->resultSet();
+        return $stu_info_select;
+    }
+    
+    public function delete(){
+        if(isset($_POST['delete_items'])){
+            $this->query('DELETE FROM stu_info WHERE id=:id');
+            $this->bind(':id' ,  $_GET['id']);
+            $this->execute();
+            header ('Location: ' . ROOT_URL .'/student/info');
+        }
+        $this->query('SELECT * FROM stu_info WHERE id=:id');;
+        $this->bind(':id' ,  $_GET['id']);
+        $select_to_delete= $this->resultSet();;
+        return $select_to_delete ;
+    }
+
+    public function registerss(){
+        $post = filter_input_array(INPUT_POST,FILTER_SANITIZE_STRING);
+        if(isset($_POST['add_stus'])){
+            $this->query('INSERT INTO stu_info( StuNum, StuName, mothername, gender, DOB, POB, Natinality, StuAddress, city, contry, Phones, relname, reltype, reldigree, relphones, Ctype, CYear, Cschool, CLanuage, Department, Section, stuGroup, StuLevel, active )              
+                                      VALUES (:StuNum,:StuName,:mothername,:gender,:DOB,:POB,:Natinality,:StuAddress,:city,:contry,:Phones,:relname,:reltype,:reldigree,:relphones,:Ctype,:CYear,:Cschool,:CLanuage,:Department,:Section,:stuGroup,:StuLevel,1)');
+                $this->bind(':StuNum' , $_POST['selected_stu_num_value']);
+                $this->bind(':StuName', $_POST['StuName']);
+                $this->bind(':mothername', $_POST['mothername']);
+                $this->bind(':gender', $_POST['gender']);
+                $this->bind(':DOB', $_POST['DOB']);
+                $this->bind(':POB', $_POST['POB']);
+                $this->bind(':Natinality', $_POST['Natinality']);
+                $this->bind(':StuAddress', $_POST['StuAddress']);
+                $this->bind(':city', $_POST['city']);
+                $this->bind(':contry', $_POST['contry']);
+                $this->bind(':Phones', $_POST['Phones']);
+                $this->bind(':relname', $_POST['relname']);
+                $this->bind(':reltype', $_POST['reltype']);
+                $this->bind(':reldigree', $_POST['reldigree']);
+                $this->bind(':relphones', $_POST['relphones']);
+                $this->bind(':Ctype', $_POST['Ctype']);
+                $this->bind(':CYear', $_POST['CYear']);
+                $this->bind(':Cschool', $_POST['Cschool']);
+                $this->bind(':CLanuage', $_POST['CLanuage']);
+                $this->bind(':Department', $_POST['selected_dep_value']);
+                $this->bind(':Section', $_POST['selected_sec_value']);
+                $this->bind(':stuGroup', $_POST['selected_grp_value']);
+                $this->bind(':StuLevel', $_POST['selected_lev_value']);
+                 
+                $this->execute();
+                if($this->lastInsertId()){
+                    $_SESSION['msg'] = SUCCESS;
+                   // header ('Refresh: 2; ' . ROOT_URL .'/level');
+           }
+           else {
+            $_SESSION['msg'] = 'dfvdf';
+           }
+        }
+    }
+ 
+
+   public function register(){
+    $post = filter_input_array(INPUT_POST,FILTER_SANITIZE_STRING);
+    if(isset($_POST['add_stu'])){
+        $this->query('INSERT INTO stu_info( StuNum,StuName, mothername, gender, DOB, POB, Natinality, StuAddress, city, contry, Phones, active)              
+                                  VALUES (:StuNum,:StuName,:mothername,:gender,:DOB,:POB,:Natinality,:StuAddress,:city,:contry,:Phones,1)');
+            
+            $this->bind(':StuNum', $post['StuNum']);
+            $this->bind(':StuName', $post['StuName']);          
+            $this->bind(':mothername', $post['mothername']);
+            $this->bind(':gender', $post['gender']);
+            $this->bind(':DOB', $post['DOB']);
+            $this->bind(':POB', $post['POB']);
+            $this->bind(':Natinality', $post['Natinality']);
+            $this->bind(':StuAddress', $post['StuAddress']);
+            $this->bind(':city', $post['city']);
+            $this->bind(':contry', $post['contry']);
+            $this->bind(':Phones', $post['Phones']);
+            $this->execute();
+            if($this->lastInsertId()){
+                $_SESSION['msg'] = SUCCESS;
+                $current_stu_id = $this->lastInsertId();
+                header ('Refresh: 0.5; ' . ROOT_URL .'/student/Studentrels/' . $current_stu_id);
+       }
+       else {
+           
+        $_SESSION['msg'] = $this->getCode();
+       }
+
+
+       
+    }
+   }
+   public function  Studentrels(){
+        $stu_num = intval($_GET['id']);
+        $post = filter_input_array(INPUT_POST,FILTER_SANITIZE_STRING);
+        if(isset($_POST['add'])){
+            $this->query('INSERT INTO stu_info( StuNum,relname, reltype, reldigree, relphones)              
+                                      VALUES (:StuNum,:relname,:reltype,:reldigree,:relphones');
+                $this->bind(':StuNum', $stu_num);
+                $this->bind(':relname', $post['relname']);          
+                $this->bind(':reltype', $post['reltype']);
+                $this->bind(':reldigree', $post['reldigree']);
+                $this->bind(':relphones', $post['relphones']);
+                $this->execute();
+                if($this->lastInsertId()){
+                    $_SESSION['msg'] = SUCCESS;
+                    header ('Refresh: 0.5; ' . ROOT_URL .'/student/Studentacademic/' .  $stu_num );
+           }
+           else {
+               
+            $_SESSION['msg'] = $this->getCode();
+           }  
+        }    
+    }
+
+
+    public function  Studentacademic(){
+
+    }
+   
+       public function getdepartment(){
+       
+      
+   }
+}
