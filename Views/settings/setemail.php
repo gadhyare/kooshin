@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: اعدادات البريد الإلكتروني
+ */
+?>
 <div class="container col-xs-12 col-md-6 m-auto txt-left">
     <div class="card-hader bg-dark text-white text-center p-2">
         اعدادات البريد الإلكتروني
@@ -12,7 +18,7 @@
                             <input type="text" name="em_Host" id="em_Host" class="form-control text-left" value="<?php echo $item["em_Host"]; ?>">
                         </div>
                         <div class="col-xs-12 col-md-6">
-                            <label for="em_userName"> اسم المستخدم </label>
+                            <label for="em_userName"> اسم الأعضاء</label>
                             <input type="text" name="em_userName" id="em_userName" class="form-control text-left" value="<?php echo $item["em_userName"]; ?>">
                         </div>
                     </div>
@@ -37,10 +43,9 @@
                         </div>
                     </div>
                     <button type="submit" name="updateBtn" class="btn success-color-dark text-white float-right  px-3 py-1"> اضافة </button>
-                    <a href="<?php echo ROOT_URL;?>/settings" class="btn danger-color-dark text-white float-left  px-3 py-1"> تراجع </a>
+                    <a href="<?php echo ROOT_URL; ?>/settings" class="btn danger-color-dark text-white float-left  px-3 py-1"> تراجع </a>
                 </form>
             <?php endforeach; ?>
         </div>
     </div>
 </div>
-

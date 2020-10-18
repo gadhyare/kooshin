@@ -57,4 +57,12 @@
         $viewmodel = new SubjectModel();
         $this->returnView($viewmodel->uploadsujectlist(), true);
     }
+
+    protected function ordersubByfacldel()
+    {
+        $viewmodel = new SubjectModel();
+        $this->returnView($viewmodel->ordersubByfacldel(), true);
+    }
+
+    
 }

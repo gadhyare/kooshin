@@ -18,12 +18,20 @@ body{
         background-color: #1a4567 !important;
         -webkit-print-color-adjust: exact; 
     }
+    .printDataTale  {
+    background-color:#000 !important ;
+    color: #fff !important ;
+}
 }
 
 @media print {
     .vendorListHeading th {
         color: white !important;
     }
+    .printDataTale  {
+    background-color:#000 !important ;
+    color: #fff !important ;
+}
 }
 .print-page {
     margin-top: 10px !important;
@@ -68,3 +76,4 @@ body{
     float: left;
     border-bottom: 1px solid #333;
 }
+

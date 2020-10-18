@@ -306,6 +306,14 @@
         $this->ReturnView($viewmodel->empsellarypaidprint(), false);
     }
 
+   protected function empcurrentsellarypaidprint()
+    {
+        $viewmodel = new FinanceModel();
+        $this->ReturnView($viewmodel->empcurrentsellarypaidprint(), false);
+    }
+    
+
+
     protected function empdeductionprint()
     {
         $viewmodel = new FinanceModel();
@@ -329,4 +337,12 @@
         $viewmodel = new FinanceModel();
         $this->ReturnView($viewmodel->bankaccountreportprint(), false);
     }
+
+
+       protected function searchexpensebydate()
+    {
+        $viewmodel = new FinanceModel();
+        $this->ReturnView($viewmodel->searchexpensebydate(), false);
+    }
+ 
 }

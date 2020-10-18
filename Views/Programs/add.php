@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: اضافة برنامج دارسي
+ */
+?>
 <div class="container mt-5 col-xs-12 col-sm-10 col-md-8">
     <?php $op = new Khas(); ?>
     <?php $fac_id = (isset($_POST['fac_id'])) ? $_POST['fac_id'] : ''; ?>
@@ -11,9 +17,9 @@
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-6">
                         <div class="form-group">
-                        <label> الكلية </label>
+                            <label> الكلية </label>
                             <select name="fac_id" id="fac_id" class="form-control p-1  rounded-0">
-                            <?php $op->GetSelfaculty($fac_id); ?>
+                                <?php $op->GetSelfaculty($fac_id); ?>
                             </select>
                         </div>
                     </div>
@@ -21,7 +27,7 @@
                         <div class="form-group">
                             <label> المرحلة الأكاديمية </label>
                             <select name="edulev_id" id="edulev_id" class="form-control p-1  rounded-0">
-                            <?php $op->Getedulevel($edulev_id); ?>
+                                <?php $op->Getedulevel($edulev_id); ?>
                             </select>
                         </div>
                     </div>
@@ -50,8 +56,8 @@
 
 
 
-                <input type="submit" name="submit" value="اضافة" class="btn btn-primary text-light px-3 py-2">
-                <a href="<?php echo ROOT_URL; ?>/programs" class="btn btn-danger text-light p-2">إلغاء</a>
+                <input type="submit" name="submit" value="اضافة" class="btn primary-color-dark text-white px-3 py-2">
+                <a href="<?php echo ROOT_URL; ?>/programs" class="btn danger-color-dark text-white p-2">إلغاء</a>
             </form>
         </div>
     </div>

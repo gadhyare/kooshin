@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: تعديل مجموعة
+ */
+?>
 <div class="container mt-5 col-xs-12 col-sm-10 col-md-6">
     <script type="text/javascript">
         function showhidden() {
@@ -25,16 +31,16 @@
                         <label>حالة المجموعة </label>
                         <select name="active" id="" class="form-control p-1  rounded-0" onclick="showhidden()">
                             <?php foreach ($arr as $key => $val) {
-                                    $status = ($edit_items['active'] == $key) ? 'selected' : '';
-                                    echo '<option value="' . $key . '" ' . $status . '>' . $val . '</option>';
-                                }
-                                ?>
+                                $status = ($edit_items['active'] == $key) ? 'selected' : '';
+                                echo '<option value="' . $key . '" ' . $status . '>' . $val . '</option>';
+                            }
+                            ?>
                         </select>
                         <input type="hidden" name="selected_value" value="<?php echo $edit_items['active']; ?>">
                     </div>
                 <?php endforeach; ?>
-                <input type="submit" name="edit_submit" value="تعديل" class="btn btn-primary text-light px-3 py-2">
-                <a href="<?php echo ROOT_URL; ?>/group" class="btn btn-danger text-light p-2">إلغاء</a>
+                <input type="submit" name="edit_submit" value="تعديل" class="btn primary-color-dark text-white px-3 py-2">
+                <a href="<?php echo ROOT_URL; ?>/group" class="btn danger-color-dark text-white p-2">إلغاء</a>
             </form>
         </div>
     </div>

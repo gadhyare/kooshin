@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName:    تفعيل تعديل رسوم دراسية
+ */
+?>
 <?php foreach ((array) $viewmodel as $item) : ?>
     <div class="container col-xs-12 col-md-6 m-auto">
         <div class="card p-0 rounded-0 border-0 z-depth-1">
@@ -52,12 +58,12 @@
                             <div class="col-xs-12 col-md-6">
                                 جهةالدفع
                                 <hr class="p-1 mt-0 mb-0">
-                                <input type="number" name="opnum"  id="opnum" min="0" step="1" value="0" class="form-control p-0 rounded-0       bg-white">
+                                <input type="number" name="opnum" id="opnum" min="0" step="1" value="0" class="form-control p-0 rounded-0       bg-white">
                             </div>
                             <div class="col-xs-12 col-md-6">
-                                 نوع العملية
+                                نوع العملية
                                 <hr class="p-1 mt-0 mb-0">
-                                <select name="opname" id="opname"   class="form-control p-0 rounded-0       bg-white">
+                                <select name="opname" id="opname" class="form-control p-0 rounded-0       bg-white">
                                     <option value="1"> زيادة </option>
                                     <option value="2"> خصم </option>
                                 </select>
@@ -65,8 +71,8 @@
                         </div>
                     </div>
                     <hr>
-                    <button type="submit" name="doUpload"  class="btn success-color-dark text-white px-3 py-2" >  تعديل الرسوم  </button>
-                    <a href="<?php echo ROOT_URL;?>/finance/updatetransfee"  class="btn danger-color-dark text-white float-left px-3 py-2"> إلغاء </a>
+                    <button type="submit" name="doUpload" class="btn success-color-dark text-white px-3 py-2"> تعديل الرسوم </button>
+                    <a href="<?php echo ROOT_URL; ?>/finance/updatetransfee" class="btn danger-color-dark text-white float-left px-3 py-2"> إلغاء </a>
                 </div>
             </form>
         </div>

@@ -1,6 +1,12 @@
+<?php
+
+/**
+ * fileName:    معلومات الرسوم
+ */
+?>
 <div class="container">
-        <?php $op = new Khas(); ?>
-        <div class="row">
+    <?php $op = new Khas(); ?>
+    <div class="row">
         <?php foreach ((array) $viewmodel as $item) : ?>
 
             <div class="col-xs-12 col-md-6">
@@ -43,9 +49,9 @@
                     </div>
                 </div>
             </div>
-            <?php endforeach; ?>
-            <?php $row = $op->getstupaidfeetoupdate($_GET['sta_id']);?>
-            <?php foreach((array) $row as $editItem):?>
+        <?php endforeach; ?>
+        <?php $row = $op->getstupaidfeetoupdate($_GET['sta_id']); ?>
+        <?php foreach ((array) $row as $editItem) : ?>
             <div class="col-xs-12 col-md-6">
                 <form action="<?php $_SERVER['PHP_SELF']; ?>" method="POST" enctype="multipart/form-data">
 
@@ -57,23 +63,23 @@
                             <div class="row">
                                 <div class="col-xs-12 col-md-6">
                                     تاريخ الدفع
-                                    <input type="date" name="payDate" min="2019-01-01" value="<?php echo $editItem['payDate'] ; ?>" id="payDate" class="form-control">
+                                    <input type="date" name="payDate" min="2019-01-01" value="<?php echo $editItem['payDate']; ?>" id="payDate" class="form-control">
                                 </div>
                                 <div class="col-xs-12 col-md-6">
                                     إجمالي المطلوب
-                                    <input type="number" name="want" id="want"  value="<?php echo $editItem['want'] ; ?>"  class="form-control rounded-0" min="0" disabled>
+                                    <input type="number" name="want" id="want" value="<?php echo $editItem['want']; ?>" class="form-control rounded-0" min="0" disabled>
                                 </div>
                                 <div class="col-xs-12 col-md-6">
                                     الخصم
-                                    <input type="number" name="Discount" id="Discount"  value="<?php echo $editItem['Discount'] ; ?>"  min="0" value="<?php echo  $op->setPosts('Discount'); ?>" class="form-control">
+                                    <input type="number" name="Discount" id="Discount" value="<?php echo $editItem['Discount']; ?>" min="0" value="<?php echo  $op->setPosts('Discount'); ?>" class="form-control">
                                 </div>
                                 <div class="col-xs-12 col-md-6">
                                     المدفوع
-                                    <input type="number" name="amount" id="amount"    value="<?php echo $editItem['amount'] ; ?>"    step="any" class="form-control rounded-0" min="0">
+                                    <input type="number" name="amount" id="amount" value="<?php echo $editItem['amount']; ?>" step="any" class="form-control rounded-0" min="0">
                                 </div>
                                 <div class="col-xs-12 col-md-6">
                                     رقم السند
-                                    <input type="text" name="statment_num" id="statment_num"  value="<?php echo $editItem['statment_num'] ; ?>"  min="0" class="form-control">
+                                    <input type="text" name="statment_num" id="statment_num" value="<?php echo $editItem['statment_num']; ?>" min="0" class="form-control">
                                 </div>
                                 <div class="col-xs-12 col-md-6">
                                     ملاحظات
@@ -86,8 +92,8 @@
                     </div>
                 </form>
             </div>
-            <?php endforeach; ?>
-        </div>
-    
+        <?php endforeach; ?>
+    </div>
+
     <br>
 </div>

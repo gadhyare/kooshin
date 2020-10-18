@@ -129,35 +129,75 @@ class SubjectModel extends Model
 
     public function uploadsujectlist()
     {
-        if (isset($_POST['FileUp'])) {
+        if (isset($_POST['FileUp'])) { 
             $op = new Khas();
-            $op->uploadFiles($_FILES['uploadFile'], "xlsx", 2000000);
-            $inputType = "Xlsx";
-            $f_upload_dir =   getcwd() . "/uplouds/";
-            $inputFileNmae =   $f_upload_dir."/".$_FILES['uploadFile']['name'];
-            $reader = IOFactory::createReader($inputType);
-            $reader->setReadDataOnly(true);
-            $spreadsheet = $reader->load($inputFileNmae);
-            $sheetData = $spreadsheet->getActiveSheet()->toArray();
-            foreach($sheetData as $row){
-                $subject_name = isset($row[0]) ? $row[0] : "";
-                $subject_code = isset($row[1]) ? $row[1] : "";
-                $this->query('INSERT INTO subject(subject_name,subject_code,prog_id, active) VALUES (:subject_name,:subject_code,:prog_id,:active)');
-                $this->bind(':subject_name' , $subject_name);
-                $this->bind(':subject_code' , $subject_code);
-                $this->bind(':prog_id' , $_GET['pro_id']);            
-                $this->bind(':active', 1);
-                $this->execute();
-                if($this->lastInsertId()){
-                    $_SESSION['msg'] =   SUCCESS;
+            $files = $_FILES['uploadFile'];
+            $f_name    = $files['name'];
+            $f_tmp     = $files['tmp_name'];
+            $f_size    = $files['size'];
+            $f_error   = $files['error'];
+            $file_type = pathinfo($f_name, PATHINFO_EXTENSION);
+    
+            if ( $file_type == "xlsx"  ) {
+                if ($f_error === 0) {
+                    if ($f_size < 2000000) {
+                        $f_upload_dir =   getcwd() . "/uplouds/";
+                        $inputFileNmae =   $f_upload_dir . $op->random_string(20) . "." . $file_type;
+                        if (move_uploaded_file($f_tmp, $inputFileNmae  )) {
+                            $inputType = "Xlsx";
+                            $reader = IOFactory::createReader($inputType);
+                            $reader->setReadDataOnly(true);
+                            $spreadsheet = $reader->load($inputFileNmae);
+                            $sheetData = $spreadsheet->getActiveSheet()->toArray();
+                            $x = 1;
+                            foreach ($sheetData as $row) {
+                                if ($x != 1) :
+                                    $subject_name =  $row[1];
+                                    $subject_code =  $row[2];
+                                    if ($subject_name == "") continue;
+                                    $this->query('INSERT INTO subject(subject_name,subject_code,prog_id, active) VALUES (:subject_name,:subject_code,:prog_id,:active)');
+                                    $this->bind(':subject_name', $subject_name);
+                                    $this->bind(':subject_code', $subject_code);
+                                    $this->bind(':prog_id', $_GET['pro_id']);
+                                    $this->bind(':active', 1);
+                                    $this->execute();
+                                    if ($this->lastInsertId()) {
+                                        $_SESSION['msg'] =   SUCCESS;
+                                    }
+                                endif;
+                                $x++;
+                            }
+
+
+                            if ($this->lastInsertId()) {
+                                $_SESSION['msg'] = SUCCESS;
+                                unlink($inputFileNmae);
+                            }
+                        }
+                    } else {
+                        $_SESSION['msg']  = FILE_SIZE_ERR;
+                    }
+                } else {
+                    $_SESSION['msg'] = ERR_UPLOADS;
                 }
+            } else {
+                $_SESSION['msg']  = FILE_TYPE_ERR;
             }
 
-
-            if($this->lastInsertId()) {
-                $_SESSION['msg'] = SUCCESS;
-                unlink($f_upload_dir . $_FILES['uploadFile']['name']);
-            }
         }
+    }
+
+
+    public function ordersubByfacldel()
+    {
+        $sub_id = explode(",", $_GET['sub_id']);
+
+        for($b = 0; $b < count($sub_id) ; $b++){
+            $this->query("DELETE FROM subject WHERE sub_id=:sub_id");
+            $this->bind(':sub_id' , $sub_id[$b]);
+            $this->execute();
+        }
+        $_SESSION['msg'] =   SUCCESS;
+        header('refresh:0;url=' . ROOT_URL . '/subject/ordersubByfacl?edulev_id='.$_GET['edulev_id'].'&pro_id='.$_GET['pro_id']);
     }
 }

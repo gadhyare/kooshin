@@ -1,6 +1,11 @@
-<?php class HomeModel extends Model{
+<?php 
+ 
+class HomeModel extends Model{
     public  $rowss;
+ 
     public function Index(){
+        $op = new Khas();
+        
         $this->query('SELECT * FROM levels ORDER BY id ASC');
 		$rows = $this->resultSet();
 		return $rows;

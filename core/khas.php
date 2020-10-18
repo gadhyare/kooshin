@@ -1,4 +1,5 @@
 <?php require_once('Models.php'); ?>
+
 <?php class Khas extends Model
 {
 
@@ -8,8 +9,12 @@
     {
         $controller_breadcrumb = $_GET['controller'];
         $action_breadcrumb = $_GET['action'];
-        if (isset($action_breadcrumb)) {
-            $link  = "<a href='" . $this->siteSetting('siteUrl') . $controller_breadcrumb . "' class='text-dark'>" . $controller_breadcrumb . "</a>/" . $action_breadcrumb;
+        $dir = getcwd() . "/Views/" ?? '';
+        if (isset($action_breadcrumb) && $action_breadcrumb != "") {
+            $link  = "<a href='" . $this->siteSetting('siteUrl') . $controller_breadcrumb . "' class='text-danger'>" . $this->gar($controller_breadcrumb) . "</a>/" . $this->get_file_name($dir . $controller_breadcrumb . "/" . $action_breadcrumb . ".php");
+            $_SESSION['link'] = $link;
+        } else {
+            $link  = "<a href='" . $this->siteSetting('siteUrl') . $controller_breadcrumb . "' class='text-dark'>" . $this->gar($controller_breadcrumb) . "</a>";
             $_SESSION['link'] = $link;
         }
     }
@@ -42,7 +47,7 @@
     }
 
 
-    
+
     public function is_email($email)
     {
         $chemail = filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -65,6 +70,16 @@
         return $setting[$val];
     }
 
+    /**
+     * stringify 
+     */
+
+
+    function stringify($item)
+    {
+        return (string)$item;
+    }
+
     public function setPosts($val)
     {
         if (isset($_POST[$val])) {
@@ -74,6 +89,130 @@
         }
     }
 
+    /**
+     * here we can get folder name in arabic 
+     * @param string keyname 
+     * @param string user_appility
+     */
+
+    public function get_stting_arabic(string $keyname, string $user_appility)
+    {
+        $appility = new Abillity();
+        $t = $this->stringify($user_appility);
+        $appility_info = $appility->$t();
+        if (array_key_exists($keyname, $appility_info)) {
+            return  $appility_info[$keyname];
+        }
+    }
+
+
+    public function gar(string $val)
+    {
+        $role = $this->stringify($_SESSION['log_role']);
+        $arr = new Abillity();
+        $trn_role = $arr->$role();
+        return  $trn_role[$val];
+    }
+
+
+
+
+    /**
+     * here we can get user info
+     * @param int user_id
+     * @param string value
+     */
+    public function get_user_info(int $usrid, string $val)
+    {
+        $this->query('SELECT * FROM users WHERE usrid=:usrid');
+        $this->bind(":usrid", $usrid);
+        $rows = $this->resultSet();
+        if ($rows) {
+            foreach ($rows as $item) {
+                $data = $item[$val];
+            }
+            return $data;
+        }
+    }
+    /**
+     * here we can transilate user role to arabic 
+     * @param string role
+     */
+    public function tran_user_role_list(string $role)
+    {
+        $role_array = array(
+            'manager' => 'مدير',
+            'finance' => 'محاسب',
+            'Director_of_the_Department' => 'مدير قسم',
+            'admin' => 'الشؤون الإدارية',
+            'students_Affairs' => 'شؤون الطلاب',
+            'student' => 'طالب',
+        );
+
+        foreach ($role_array as $item => $val) {
+            $sel = ($item == $role) ? "selected" : "";
+            echo '<option value="' . $item . '" ' . $sel . '>' . $val . '</option>';
+        }
+    }
+    /**
+     * here we can transilate user role to arabic 
+     * @param string role
+     */
+    public function tran_user_role(string $role)
+    {
+        $role_array = array(
+            'manager' => 'مدير',
+            'finance' => 'محاسب',
+            'Director_of_the_Department' => 'مدير قسم',
+            'admin' => 'الشؤون الإدارية',
+            'students_Affairs' => 'شؤون الطلاب',
+            'student' => 'طالب',
+        );
+        return $role_array[$role];
+    }
+    /**
+     * here we can get file name in comment 
+     * @param string filepath
+     */
+
+    /**
+     * 
+     */
+    function get_gravatar($email, $s = 80, $d = 'mp', $r = 'g', $img = false, $atts = array())
+    {
+        $url = 'https://www.gravatar.com/avatar/';
+        $url .= md5(strtolower(trim($email)));
+        $url .= "?s=$s&d=$d&r=$r";
+        if ($img) {
+            $url = '<img src="' . $url . '"';
+            foreach ($atts as $key => $val)
+                $url .= ' ' . $key . '="' . $val . '"';
+            $url .= ' />';
+        }
+        return $url;
+    }
+
+
+    public function get_file_name(string $filepath)
+    {
+        $file = $filepath;
+        $searchfor = 'fileName:';
+
+        // get the file contents, assuming the file to be readable (and exist)
+        $contents = file_get_contents($file);
+
+        // escape special characters in the query
+        $pattern = preg_quote($searchfor, '/');
+        // finalise the regular expression, matching the whole line
+        $pattern = "/^.*$pattern.*\$/m";
+        // search, and store all matching occurences in $matches
+        if (preg_match_all($pattern, $contents, $matches)) {
+            $filename = implode($matches[0]);
+            return  str_replace("fileName:", "", str_replace("*", "", $filename));
+        } else {
+            return false;
+        }
+    }
     public function setSelectValue($sel)
     {
     }
@@ -113,15 +252,17 @@
 
     public function FullProgInfo()
     {
+        if ($_SESSION['log_role'] ==  "manager") :
+            $this->query("SELECT *  from programs");
+        else :
 
-        $this->query("SELECT * FROM programs  ORDER BY edulev_id ASC");
+            $this->query("SELECT *  from programs   LEFT JOIN auth_roles ON programs.prog_id = auth_roles.prog_id
+                        WHERE  auth_roles.usrid = :usrid");
+            $this->bind(":usrid", $this->stringify($_SESSION['log_id']));
+        endif;
         $menu = $this->resultSet();
-        $dc = 1;
-
         foreach ($menu as $bv) { ?>
-            <?php $dc++; ?>
             <option value="<?php echo $bv['prog_id']; ?>"><?php echo $this->GetSeleduleveltxt($bv['edulev_id']) . ' - ' . $this->GetSelfacultytxt($bv['fac_id']) . ' - ' . $this->GetSelacademicstxt($bv['academics_id']) ?> </option>
-
         <?php
         }
     }
@@ -129,10 +270,14 @@
 
     public function FullSelProgInfo($val)
     {
-
-        $this->query("SELECT * FROM programs");
+        if ($_SESSION['log_role'] == $this->stringify("manager") || $_SESSION['log_role'] == $this->stringify("manager")) :
+            $this->query("SELECT *  from programs");
+        else :
+            $this->query("SELECT *  from programs   LEFT JOIN auth_roles ON programs.prog_id = auth_roles.prog_id
+                        WHERE  auth_roles.usrid = :usrid");
+            $this->bind(":usrid", $this->stringify($_SESSION['log_id']));
+        endif;
         $menu = $this->resultSet();
-        $dc = 1;
 
         foreach ($menu as $bv) { ?>
             <?php $sel = ($val == $bv['prog_id']) ? 'selected' : ''; ?>
@@ -141,18 +286,99 @@
         }
     }
 
-    public function FullSelProgInfotxt($val)
+    public function FullSelProgInfoByLev($val)
     {
-
-        $this->query("SELECT * FROM programs");
+        if ($_SESSION['log_role'] == $this->stringify("manager") || $_SESSION['log_role'] == $this->stringify("manager")) :
+            $this->query("SELECT *  from programs WHERE  edulev_id =:edulev_id");
+            $this->bind(":edulev_id",  $val);
+        else :
+            $this->query("SELECT prog_id    from programs   LEFT JOIN auth_roles ON programs.prog_id = auth_roles.prog_id
+                            WHERE  auth_roles.usrid = :usrid AND programs.edulev_id =:edulev_id");
+            $this->bind(":usrid", $this->stringify($_SESSION['log_id']));
+            $this->bind(":edulev_id",  $val);
+        endif;
         $menu = $this->resultSet();
-   
-        foreach ($menu as $bv) {  
- 
-           return  $this->GetSeleduleveltxt($bv['edulev_id']) . ' - ' . $this->GetSelfacultytxt($bv['fac_id']) . ' - ' . $this->GetSelacademicstxt($bv['academics_id']) ;
-       
+        foreach ($menu as $bv) { ?>
+            <option value="<?php echo $bv['prog_id']; ?>"><?php echo $this->GetSeleduleveltxt($bv['edulev_id']) . ' - ' . $this->GetSelfacultytxt($bv['fac_id']) . ' - ' . $this->GetSelacademicstxt($bv['academics_id']) ?> </option>
+        <?php
         }
     }
+
+    public function FullProgInfolisttxt()
+    {
+        if ($_SESSION['log_role'] == $this->stringify("manager") || $_SESSION['log_role'] == $this->stringify("manager")) :
+            $this->query("SELECT *  from programs");
+        else :
+
+            $this->query("SELECT *  from programs   LEFT JOIN auth_roles ON programs.prog_id = auth_roles.prog_id
+                        WHERE  auth_roles.usrid = :usrid");
+            $this->bind(":usrid", $this->stringify($_SESSION['log_id']));
+        endif;
+        $menu = $this->resultSet();
+        return $menu;
+    }
+
+
+
+    public function chkSelProgtxt($prog_id)
+    {
+        if ($_SESSION['log_role'] == $this->stringify("manager") || $_SESSION['log_role'] == $this->stringify("manager")) :
+            $this->query("SELECT *  from programs");
+        else :
+            $this->query("SELECT *  from programs   LEFT JOIN auth_roles ON programs.prog_id = auth_roles.prog_id
+                            WHERE  auth_roles.usrid = :usrid AND auth_roles.prog_id=:prog_id");
+            $this->bind(":usrid", $this->stringify($_SESSION['log_id']));
+            $this->bind(":prog_id", $prog_id);
+        endif;
+        $row = $this->resultSet();
+        if ($row) {
+            return true;
+        } else {
+            die($this->err_message());
+        }
+    }
+
+    public function chkSelProg($prog_id)
+    {
+        if ($_SESSION['log_role'] == $this->stringify("manager")) :
+            $this->query("SELECT *  from programs");
+        else :
+            $this->query("SELECT *  from programs   LEFT JOIN auth_roles ON programs.prog_id = auth_roles.prog_id
+                            WHERE  auth_roles.usrid = :usrid AND auth_roles.prog_id=:prog_id");
+            $this->bind(":usrid", $this->stringify($_SESSION['log_id']));
+            $this->bind(":prog_id", $prog_id);
+        endif;
+        $row = $this->resultSet();
+        if ($row) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    public function FullSelProgInfoList($edulev_id)
+    {
+        $this->query("SELECT * FROM programs WHERE edulev_id=:edulev_id");
+        $this->bind(":edulev_id", $edulev_id);
+        $data = $this->resultSet();
+        if ($data) {
+            return $data;
+        }
+    }
+
+
+    public function FullSelProgInfotxt($val)
+    {
+        $this->query("SELECT * FROM programs");
+        $menu = $this->resultSet();
+        foreach ($menu as $bv) {
+            return  $this->GetSeleduleveltxt($bv['edulev_id']) . ' - ' . $this->GetSelfacultytxt($bv['fac_id']) . ' - ' . $this->GetSelacademicstxt($bv['academics_id']);
+        }
+    }
+
+
+
     public function FullSelProgInfobyEdulevid($val)
     {
 
@@ -168,7 +394,13 @@
         }
     }
 
-
+    public function FullSelProgInfobyEdulevidList($val)
+    {
+        $this->query("SELECT * FROM programs WHERE edulev_id=:id");
+        $this->bind(":id", $val);
+        $row = $this->resultSet();
+        return $row;
+    }
     public function FulltextProgInfo($id)
     {
 
@@ -250,8 +482,6 @@
         }
     }
 
-
-
     public function getStuInfoById($val, $data)
     {
         $this->query("SELECT * FROM stu_info WHERE  stu_id=:id");
@@ -261,10 +491,28 @@
             foreach ($stuNames as $stuName) {
                 return $stuName[$data];
             }
-        } else {
-            return "--";
         }
     }
+
+    /**
+     * here we can get all programs that the selected student is inroll it
+     * @param int $id
+     * @return int
+     */
+    public function get_sel_student_prgrams(int $id)
+    {
+
+        $this->query("SELECT * FROM  subject    WHERE   prog_id=:prog_id");
+        $this->bind(":prog_id", $id);
+        $rows = $this->resultSet();
+        if ($rows) {
+            foreach ($rows as $items) {
+                echo '<option value="' . $items['sub_id'] . '">' . $items['subject_name'] . '</option>';
+            }
+        }
+    }
+
+
 
     public function getPayReso()
     {
@@ -305,8 +553,8 @@
         $this->bind(":Pay_Res_id", $Pay_Res_id);
         $row = $this->resultSet();
         foreach ($row as $feeInfo) {
+            return $feeInfo['fee_amount'];
         }
-        return $feeInfo['fee_amount'];
     }
 
 
@@ -347,8 +595,10 @@
         $this->bind(":id", $val);
         $menu = $this->resultSet();
         foreach ($menu as $bv) {
-            echo $bv['department_name'];
+            $data =  $bv['department_name'];
         }
+
+        return $data;
     }
 
     public function GetSelProgram($val)
@@ -396,6 +646,17 @@
             return  $bv['edulev_name'];
         }
     }
+
+    public function GetSeledulevelInfotxt($id,$val)
+    {
+        $this->query('SELECT * FROM edulevel WHERE edulev_id=:id');
+        $this->bind(":id", $id);
+        $menu = $this->resultSet();
+        foreach ($menu as $bv) {
+            return  $bv[$val];
+        }
+    }
+
 
     public function GetSellevels($val)
     {
@@ -446,6 +707,16 @@
         }
     }
 
+        public function GetSelfacultyinfotxt($id,$val)
+    {
+        $this->query('SELECT * FROM faculty  WHERE fac_id=:id');
+        $this->bind(":id", $id);
+        $menu = $this->resultSet();
+        foreach ($menu as $bv) {
+            return $bv[$val];
+        }
+    }
+
 
     public function GetSelgroups($val)
     {
@@ -466,8 +737,9 @@
         $this->bind(":id", $val);
         $menu = $this->resultSet();
         foreach ($menu as $bv) {
-            echo $bv['group_name'];
+            $data =  $bv['group_name'];
         }
+        return $data;
     }
 
 
@@ -503,7 +775,7 @@
             <?php $sel = ($val == $bv['academics_id']) ? 'selected' : ''; ?>
             <?php $dc++; ?>
             <option value="<?php echo $bv['academics_id']; ?>" <?php echo $sel; ?>><?php echo $bv['academics']; ?></option>
-            <?php
+        <?php
         }
     }
 
@@ -517,20 +789,33 @@
         }
     }
 
+    public function GetSelacademicsInfotxt($id,$val)
+    {
+        $this->query('SELECT * FROM academics  WHERE academics_id=:id');
+        $this->bind(":id", $id);
+        $menu = $this->resultSet();
+        foreach ($menu as $bv) {
+            return  $bv[$val];
+        }
+    }
     public function getprog_id($val)
     {
-
-        $this->query("SELECT * FROM subject WHERE prog_id=:prog_id AND active = 1");
-        $this->bind(":prog_id", $val);
-        $menu = $this->resultSet();
-        if (count($menu) > 0) :
-            foreach ($menu as $bv) : ?>
-                <option value="<?php echo $bv['id']; ?>"><?php echo $bv['subject_name']; ?></option>
-            <?php
-            endforeach;
+        if ($_SESSION['log_role'] == $this->stringify("manager") || $_SESSION['log_role'] == $this->stringify("manager")) :
+            $this->query("SELECT * FROM subject WHERE prog_id=:prog_id AND active = 1");
+            $this->bind(":prog_id",  $val);
         else :
-            echo "<div class='alert alert-dangert'>لا توجد مواد</div>";
+            $this->query("SELECT subject.prog_id as   prog_ids , subject.sub_id as sub_id  FROM subject   
+                            LEFT JOIN auth_roles 
+                            ON subject.prog_id = subject.prog_id
+                          WHERE  auth_roles.usrid = :usrid AND   subject.prog_id=:prog_id");
+            $this->bind(":usrid", $this->stringify($_SESSION['log_id']));
+            $this->bind(":prog_id",  $val);
         endif;
+        $menu = $this->resultSet();
+        foreach ($menu as $bv) { ?>
+            <option value="<?php echo $bv['sub_id']; ?>"><?php echo   $bv['subject_name']  ?> </option>
+        <?php
+        }
     }
 
 
@@ -623,9 +908,21 @@
         }
     }
 
+    public function get_subject_code(int $id)
+    {
+        $this->query('SELECT * FROM subject WHERE  sub_id=:sub_id');
+        $this->bind(":sub_id", $id);
+        $row = $this->resultSet();
+        foreach ($row as $item) {
+            $data = $item['subject_code'];
+        }
+
+        return $data;
+    }
+
     public function getsubjectByPro($id)
     {
-        $this->query("SELECT * FROM subject WHERE  ");
+        $this->query("SELECT * FROM subject WHERE");
         $menu = $this->resultSet();
     }
 
@@ -880,7 +1177,6 @@
         $this->bind(':id',  $val);
         $stu_rel_select = $this->resultSet();
         foreach ($stu_rel_select as $relinfo) :
-
         endforeach;
         echo $relinfo['relname'];;
     }
@@ -898,8 +1194,177 @@
         }
     }
 
+    public function report_with_no_customized($id,   $prog_id)
+    {
+        $x = 1;
+        if (isset($_GET['id']) && isset($_GET['prog_id'])) {
+            $this->query('SELECT DISTINCT  lev_id FROM exams   WHERE stu_id =:stu_id and prog_id=:prog_id ORDER BY lev_id ASC');
+            $this->bind(':stu_id', $id);
+            $this->bind(':prog_id', $prog_id);
+
+            $rows = $this->resultSet();
+            $no = 1;
+            $mysub = 1;
+            foreach ((array) $rows as $stulev) : ?>
+                <?php $gettStulev = $this->GetSellevelsTxt($stulev['lev_id']); ?>
+                <?php $CurrentLevId = $stulev['lev_id']; ?>
+                <table class="table border-0 text-center  m-auto">
+                    <tr>
+                        <td class="p-1 ">
+                            المستوى: <?php echo $gettStulev; ?>
+                        </td>
+                    </tr>
+                </table>
+                <table class="print-table text-center   m-auto">
+                    <tr>
+                        <td class="p-0 text-dark text-center" rowspan="2"> م</td>
+                        <td class="p-0 text-dark text-center" rowspan="2"> المادة </td>
+                        <td class="p-0 text-dark text-center" rowspan="2"> كود المادة </td>
+                        <td class="p-0 text-dark text-center" rowspan="2"> الدرجة </td>
+                        <td class="p-0 text-dark text-center" rowspan="2"> عدد الساعات </td>
+                        <td class="p-0 text-dark text-center" rowspan="2"> التقدير </td>
+                        <td class="p-0 text-dark text-center" rowspan="2"> الدرجة المعدلة </td>
+                        <td class="p-0 text-dark text-center" rowspan="2"> نقاط المادة </td>
+                    </tr>
+                    <tbody>
+                        <?php
+                        $this->query('SELECT * FROM exams  WHERE stu_id =:stu_id AND lev_id=:lev_id');
+                        $this->bind(':stu_id', $id);
+                        $this->bind(':lev_id', $CurrentLevId);
+                        $rowss = $this->resultSet();
+                        $x = 1;
+                        foreach ($rowss as $ecStuLev) :
+                            $total =  $ecStuLev['qu1'] + $ecStuLev['as1'] + $ecStuLev['ex1'] + $ecStuLev['qu2'] + $ecStuLev['as2'] + $ecStuLev['ex2'] + $ecStuLev['att']; ?>
+                            <?php $exSatuse = ($total < 50) ? 'class ="ex-Failed  "' : ''; ?>
+                            <?php $bgexSatuse = ($total < 50) ? 'ex-Failed p-0 rounded-0 ' : 'bg-white p-0 rounded-0  '; ?>
+                            <tr>
+                                <td class="p-1 text-center" width="5%"> <?php echo $x++; ?> </td>
+                                <td class="p-1 text-center" width="15%"><?php echo $this->getSelExsubTxt($ecStuLev['sub_id']); ?> </td>
+                                <td class="p-1 text-center"> <?php echo $ecStuLev['ex_code']; ?></td>
+                                <td class="p-1 text-center"> <?php echo $total; ?></td>
+                                <td class="p-1 text-center"> <?php echo $ecStuLev['ex_crid']; ?></td>
+                                <td class="p-1 text-center"> <?php echo $this->get_gpa($total); ?></td>
+                                <td class="p-1 text-center"> <?php echo  $ecStuLev['sub_gradPoint']; ?></td>
+                                <td class="p-1 text-center"> <?php echo  $ecStuLev['sub_Point']; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <tbody>
+                </table>
+                <?php $this->getexamInfo($this->getStuInfoByStunm($_GET['id'], 'stu_id'), $_GET['prog_id'], $stulev['lev_id']); ?>
+            <?php
+            endforeach;
+        }
+    }
+
+
+    public function num_to_word($number)
+    {
+
+        $arr_ones = array("صفر", "واحد", "اثنين", "ثلاثة", "أربعة", "خمسة", "ستة", "سبعة", "ثمان", "تسعة");
+        $arr_tens = array("عشرة", "عشرون", "ثلاثون", "أربعون", "ستون", "خمسون", "سبعون", "ثمانون", "تسعون");
+        $arr_hundred = array("مائة", "مائتان", "ثلاثمائة", "أربعمائة", "خمسمائة", "ستمائة", "سبعمائة", "ثمانمائة", "تسعمائة");
+        $eleven = "إحدى عشرة";
+        $twoelve = "إثنى عشرة";
+        $only = "فقط لاغير";
+
+        $s  = strval($number);
+        $b  = str_split($s);
+        $x = array_reverse($b);
+
+
+        if (count($b) == 1) {
+            return $arr_ones[$x[0]] . " " . $only;
+        } elseif (count($b) == 2) {
+            if ($b[1] == 1 && $b[0] == 1) {
+                return $eleven . " " . $only;
+            } elseif ($b[1] == 1 && $b[0] == 2) {
+                return $twoelve . " " . $only;
+            } else {
+                if ($b[1] == 0) {
+                    return   $arr_tens[$x[1] - 1] . " " . $only;
+                } else {
+                    return $arr_ones[$x[0]] . " و" . $arr_tens[$x[1] - 1] . " " . $only;
+                }
+            }
+        } elseif (count($b) == 3) {
+            if ($b[1] == 0 && $b[2] == 0) {
+                return $arr_hundred[$x[2] - 1]    . " " . $only;
+            } elseif ($b[1] == 1 && $b[2] == 1) {
+                return $arr_hundred[$x[2] - 1] . " و" .  $eleven    . " " . $only;
+            } elseif ($b[1] == 1 && $b[2] == 2) {
+                return $arr_hundred[$x[2] - 1] . " و" .  $twoelve    . " " . $only;
+            } elseif ($b[1] == 0) {
+                return $arr_hundred[$x[2] - 1] . " و" .  $arr_ones[$x[0]]    . " " . $only;
+            } elseif ($b[2] == 0) {
+                return $arr_hundred[$x[2] - 1] . " و" .  $arr_tens[$x[0]]    . " " . $only;
+            } else {
+                return $arr_hundred[$x[2] - 1] . " و" .  $arr_ones[$x[0]]    . " " . $arr_tens[$x[1] -  1]    . " " . $only;
+            }
+        }
+    }
+
+
+
+    public function report_with_customized(int  $id, int $prog_id)
+    {
+
+
+        $x = 1;
+        if (isset($_GET['id']) && isset($_GET['prog_id'])) {
+            $this->query('SELECT DISTINCT  lev_id FROM exams   WHERE stu_id =:stu_id and prog_id=:prog_id ORDER BY lev_id ASC');
+            $this->bind(':stu_id', $id);
+            $this->bind(':prog_id', $prog_id);
+
+            $rows = $this->resultSet();
+            $no = 1;
+            $mysub = 1;
+            foreach ((array) $rows as $stulev) : ?>
+                <?php $gettStulev = $this->GetSellevelsTxt($stulev['lev_id']); ?>
+                <?php $CurrentLevId = $stulev['lev_id']; ?>
+                <br>
+                <table class="print-table text-center   m-auto" id="tableOfTotal">
+                    <tr>
+                        <td class="p-0 text-dark text-center" width="5%"> م</td>
+                        <td class="p-0 text-dark text-center" width="10%"> المادة </td>
+                        <td class="p-0 text-dark text-center" width="10%"> الدرجة العليا</td>
+                        <td class="p-0 text-dark text-center" width="10%"> الدرجة الدنيا</td>
+                        <td class="p-0 text-dark text-center" width="15%"> الدرجة المكتسبة بالأرقام </td>
+                        <td class="p-0 text-dark text-center" width="25%"> الدرجة المكتسبة بالحروف </td>
+                        <td class="p-0 text-dark text-center" width="5%"> التقدير </td>
+                    </tr>
+                    <tbody>
+                        <?php
+                        $this->query('SELECT * FROM exams  WHERE stu_id =:stu_id AND lev_id=:lev_id');
+                        $this->bind(':stu_id', $id);
+                        $this->bind(':lev_id', $CurrentLevId);
+                        $rowss = $this->resultSet();
+                        $x = 1;
+                        foreach ($rowss as $ecStuLev) :
+                            $total =  $ecStuLev['qu1'] + $ecStuLev['as1'] + $ecStuLev['ex1'] + $ecStuLev['qu2'] + $ecStuLev['as2'] + $ecStuLev['ex2'] + $ecStuLev['att']; ?>
+                            <?php $exSatuse = ($total < 50) ? 'class ="ex-Failed  "' : ''; ?>
+                            <?php $bgexSatuse = ($total < 50) ? 'ex-Failed p-0 rounded-0 ' : 'bg-white p-0 rounded-0  '; ?>
+                            <tr>
+                                <td class="p-1 text-center" width="5%"> <?php echo $x++; ?> </td>
+                                <td class="p-1 text-center" width="15%"><?php echo $this->getSelExsubTxt($ecStuLev['sub_id']); ?> </td>
+                                <td class="p-1 text-center"> 100</td>
+                                <td class="p-1 text-center"> 50</td>
+                                <td class="p-1 text-center"> <?php echo $total; ?></td>
+                                <td class="p-1 text-center"> <?php echo $this->num_to_word(intval($total)); ?> </td>
+                                <td class="p-1 text-center"> <?php echo $this->get_gpa(intval($total)); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <tbody>
+                </table>
+                <?php $this->getexamInfo($this->getStuInfoByStunm($_GET['id'], 'stu_id'), $_GET['prog_id'], $stulev['lev_id']); ?>
+            <?php
+            endforeach;
+        }
+    }
+
     public function get_stuLev($id, $prog_id)
     {
+
+
         $post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
         $i = 1;
@@ -984,11 +1449,11 @@
                                 <?php if ($_GET['action'] == 'stuGpa') : ?>
                                     <td class="p-1 text-center">
                                         <a href="<?php echo ROOT_URL; ?>/exams/updatestuexam/<?php echo $ecStuLev['ex_id']; ?>/<?php echo $_GET['action']; ?>" target="_blank" class="unique-color-dark  text-white rounded-0  px-1 ml-1 py-0  mt-2"> <i class="fa fa-pencil p-1" aria-hidden="true"></i> </a>
-                                        <a href="<?php echo ROOT_URL; ?>/exams/stdelexam/<?php echo $ecStuLev['ex_id']; ?>/<?php echo $_GET['action']; ?>" target="_blank" class="bg-danger  text-white rounded-0  px-1 ml-1 py-0  mt-2"> <i class="fa fa-trash-o p-1" aria-hidden="true"></i> </a>
+                                        <a href="<?php echo ROOT_URL; ?>/exams/stdelexam/<?php echo $ecStuLev['ex_id']; ?>/<?php echo $_GET['action']; ?>" target="_blank" class="danger-color-dark  text-white rounded-0  px-1 ml-1 py-0  mt-2"> <i class="fa fa-trash-o p-1" aria-hidden="true"></i> </a>
                                     </td>
                                 <?php endif; ?>
                             </tr>
-                        <?php endforeach;
+                    <?php endforeach;
                     endforeach;
                     echo '<tbody></table>';
                 }
@@ -998,76 +1463,104 @@
 
             public function get_stuLevGPA($id, $prog_id)
             {
-                $x = 1;
-                if (isset($_GET['id']) && isset($_GET['prog_id'])) {
-                    $this->query('SELECT DISTINCT  lev_id FROM exams   WHERE stu_id =:stu_id and prog_id=:prog_id ORDER BY lev_id ASC');
-                    $this->bind(':stu_id', $id);
-                    $this->bind(':prog_id', $prog_id);
-
-                    $rows = $this->resultSet();
-                    $no = 1;
-                    $mysub = 1;
-                    foreach ((array) $rows as $stulev) : ?>
-                        <?php $gettStulev = $this->GetSellevelsTxt($stulev['lev_id']); ?>
-                        <?php $CurrentLevId = $stulev['lev_id']; ?>
-                        <table class="table border-0 text-center  m-auto">
-                            <tr>
-                                <td class="p-1 ">
-                                    المستوى: <?php echo $gettStulev; ?>
-                                </td>
-                            </tr>
-                        </table>
-                        <table class="print-table text-center   m-auto">
-                            <tr>
-                                <td class="p-0 text-dark text-center" rowspan="2"> م</td>
-                                <td class="p-0 text-dark text-center" rowspan="2"> المادة </td>
-                                <td class="p-0 text-dark text-center" rowspan="2"> كود المادة </td>
-                                <td class="p-0 text-dark text-center" rowspan="2"> الدرجة </td>
-                                <td class="p-0 text-dark text-center" rowspan="2"> عدد الساعات </td>
-                                <td class="p-0 text-dark text-center" rowspan="2"> التقدير </td>
-                                <td class="p-0 text-dark text-center" rowspan="2"> الدرجة المعدلة </td>
-                                <td class="p-0 text-dark text-center" rowspan="2"> نقاط المادة </td>
-                            </tr>
-                            <tbody>
-                                <?php
-                                $this->query('SELECT * FROM exams  WHERE stu_id =:stu_id AND lev_id=:lev_id');
-                                $this->bind(':stu_id', $id);
-                                $this->bind(':lev_id', $CurrentLevId);
-                                $rowss = $this->resultSet();
-                                $x = 1;
-                                foreach ($rowss as $ecStuLev) :
-                                    $total =  $ecStuLev['qu1'] + $ecStuLev['as1'] + $ecStuLev['ex1'] + $ecStuLev['qu2'] + $ecStuLev['as2'] + $ecStuLev['ex2'] + $ecStuLev['att']; ?>
-                                    <?php $exSatuse = ($total < 50) ? 'class ="ex-Failed  "' : ''; ?>
-                                    <?php $bgexSatuse = ($total < 50) ? 'ex-Failed p-0 rounded-0 ' : 'bg-white p-0 rounded-0  '; ?>
-                                    <tr>
-                                        <td class="p-1 text-center" width="5%"> <?php echo $x++; ?> </td>
-                                        <td class="p-1 text-center" width="15%"><?php echo $this->getSelExsubTxt($ecStuLev['sub_id']); ?> </td>
-                                        <td class="p-1 text-center"> <?php echo $ecStuLev['ex_code']; ?></td>
-                                        <td class="p-1 text-center"> <?php echo $total; ?></td>
-                                        <td class="p-1 text-center"> <?php echo $ecStuLev['ex_crid']; ?></td>
-                                        <td class="p-1 text-center"> <?php echo $this->get_gpa($total); ?></td>
-                                        <td class="p-1 text-center"> <?php echo  $ecStuLev['sub_gradPoint']; ?></td>
-                                        <td class="p-1 text-center"> <?php echo  $ecStuLev['sub_Point']; ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <tbody>
-                        </table>
-                        <?php $this->getexamInfo($this->getStuInfoByStunm($_GET['id'], 'stu_id'), $_GET['prog_id'], $stulev['lev_id']); ?>
-                <?php
-                    endforeach;
+                if ($this->customize_report()) {
+                    $this->report_with_customized($id,   $prog_id);
+                } else {
+                    $this->report_with_no_customized($id,   $prog_id);
                 }
             }
 
-
+            public function  getLevContinueTotal($id, $prog_id, $lev, $val)
+            {
+                if ($this->customize_report()) {
+                    $this->query("SELECT exams.stu_id,exams.prog_id, exams.lev_id, 
+                                Sum(as1+qu1+ex1+as2+qu2+ex2+att) AS total, 
+                                Sum(exams.sub_Point) AS sub_Point, Sum(exams.ex_crid) AS ex_crid, Sum(exams.as1+exams.qu1+exams.ex1+exams.as2+exams.qu2+exams.ex2+exams.att)/count(exams.stu_id) AS CRGPA
+                                FROM exams
+                                GROUP BY exams.stu_id, exams.prog_id, exams.lev_id 
+                                HAVING (((exams.stu_id)=:stu_id) AND ((exams.prog_id)=:prog_id) AND ((exams.lev_id)=:lev_id))");
+                    $this->bind(":stu_id", $id);
+                    $this->bind(":prog_id", $prog_id);
+                    $this->bind(":lev_id", $lev);
+                    $row = $this->resultSet();
+                    if ($row) {
+                        foreach ($row as $rows) {
+                            return $rows[$val];
+                        }
+                    } else {
+                        echo SUCCESS;
+                    }
+                } else {
+                    $this->query("SELECT exams.stu_id, count(exams.stu_id) as coStu, exams.prog_id, exams.lev_id, 
+                            Sum(as1+qu1+ex1+as2+qu2+ex2+att) AS total, 
+                            Sum(exams.sub_Point) AS sub_Point, Sum(exams.ex_crid) AS ex_crid, Sum(sub_Point)/count(exams.stu_id) AS CRGPA
+                            FROM exams
+                            GROUP BY exams.stu_id, exams.prog_id, exams.lev_id 
+                            HAVING (((exams.stu_id)=:stu_id) AND ((exams.prog_id)=:prog_id) AND ((exams.lev_id)=:lev_id))");
+                    $this->bind(":stu_id", $id);
+                    $this->bind(":prog_id", $prog_id);
+                    $this->bind(":lev_id", $lev);
+                    $row = $this->resultSet();
+                    if ($row) {
+                        foreach ($row as $rows) {
+                            return $rows[$val];
+                        }
+                    } else {
+                        echo SUCCESS;
+                    }
+                }
+            }
 
             public function  getLevTotal($id, $prog_id, $lev, $val)
             {
+                if ($this->customize_report()) {
+                    $this->query("SELECT exams.stu_id, count(exams.stu_id) as coStu, exams.prog_id, exams.lev_id, 
+                                Sum(as1+qu1+ex1+as2+qu2+ex2+att) AS total, 
+                                Sum(exams.sub_Point) AS sub_Point, Sum(exams.ex_crid) AS ex_crid, Sum(exams.as1+exams.qu1+exams.ex1+exams.as2+exams.qu2+exams.ex2+exams.att)/count(exams.stu_id) AS CRGPA
+                                FROM exams
+                                GROUP BY exams.stu_id, exams.prog_id, exams.lev_id 
+                                HAVING (((exams.stu_id)=:stu_id) AND ((exams.prog_id)=:prog_id) AND ((exams.lev_id)=:lev_id))");
+                    $this->bind(":stu_id", $id);
+                    $this->bind(":prog_id", $prog_id);
+                    $this->bind(":lev_id", $lev);
+                    $row = $this->resultSet();
+                    if ($row) {
+                        foreach ($row as $rows) {
+                            return $rows[$val];
+                        }
+                    } else {
+                        echo SUCCESS;
+                    }
+                } else {
+                    $this->query("SELECT exams.stu_id, count(exams.stu_id) as coStu, exams.prog_id, exams.lev_id, 
+                            Sum(as1+qu1+ex1+as2+qu2+ex2+att) AS total, 
+                            Sum(exams.sub_Point) AS sub_Point, Sum(exams.ex_crid) AS ex_crid, Sum(sub_Point)/count(exams.stu_id) AS CRGPA
+                            FROM exams
+                            GROUP BY exams.stu_id, exams.prog_id, exams.lev_id 
+                            HAVING (((exams.stu_id)=:stu_id) AND ((exams.prog_id)=:prog_id) AND ((exams.lev_id)=:lev_id))");
+                    $this->bind(":stu_id", $id);
+                    $this->bind(":prog_id", $prog_id);
+                    $this->bind(":lev_id", $lev);
+                    $row = $this->resultSet();
+                    if ($row) {
+                        foreach ($row as $rows) {
+                            return $rows[$val];
+                        }
+                    } else {
+                        echo SUCCESS;
+                    }
+                }
+            }
+
+            public function  getLevTotal_with_custome_report($id, $prog_id, $lev, $val)
+            {
+
                 $this->query("SELECT exams.stu_id, count(exams.stu_id) as coStu, exams.prog_id, exams.lev_id, 
-                Sum(as1+qu1+ex1+as2+qu2+ex2+att) AS total, 
-                Sum(exams.sub_Point) AS sub_Point, Sum(exams.ex_crid) AS ex_crid, Sum(sub_Point)/count(exams.stu_id) AS CRGPA
-                FROM exams
-                GROUP BY exams.stu_id, exams.prog_id, exams.lev_id 
-                HAVING (((exams.stu_id)=:stu_id) AND ((exams.prog_id)=:prog_id) AND ((exams.lev_id)=:lev_id))");
+                        Sum(as1+qu1+ex1+as2+qu2+ex2+att) AS total, 
+                        Sum(exams.sub_Point) AS sub_Point, Sum(exams.ex_crid) AS ex_crid, Sum(exams.as1+exams.qu1+exams.ex1+exams.as2+exams.qu2+exams.ex2+exams.att)/coStu AS CRGPA
+                        FROM exams
+                        GROUP BY exams.stu_id, exams.prog_id, exams.lev_id 
+                        HAVING (((exams.stu_id)=:stu_id) AND ((exams.prog_id)=:prog_id) AND ((exams.lev_id)=:lev_id))");
                 $this->bind(":stu_id", $id);
                 $this->bind(":prog_id", $prog_id);
                 $this->bind(":lev_id", $lev);
@@ -1118,47 +1611,100 @@
                     echo SUCCESS;
                 }
             }
+
+
+
+            public function  getLevGrandTotal_with_custome_report($id, $prog_id, $lev, $val)
+            {
+                $this->query("SELECT exams.stu_id, exams.prog_id, exams.lev_id, Sum(exams.sub_Point)/Sum(exams.ex_crid)   AS GGPA
+                FROM exams
+                GROUP BY exams.stu_id, exams.prog_id, exams.lev_id 
+                HAVING (((exams.stu_id)=:stu_id) AND ((exams.prog_id)=:prog_id) AND ((exams.lev_id)<=:lev_id))");
+                $this->bind(":stu_id", $id);
+                $this->bind(":prog_id", $prog_id);
+                $this->bind(":lev_id", $lev);
+                $row = $this->resultSet();
+                if ($row) {
+                    foreach ($row as $rows) {
+                    }
+                    return $rows[$val];
+                } else {
+                    echo SUCCESS;
+                }
+            }
             public function getexamInfo($id, $prog_id, $lev)
             {
+                if ($this->customize_report()) :
+                    ?>
+                    <hr style="margin:0;">
+                    <table class="print-table m-auto text-left printDataTale "  >
+                        <tr>
+                            <td class="p-1 text-center" width="5%"> # </td>
+                            <td class="p-1 text-center" width="15%"> المجموع </td>
+                            <td class="p-1 text-center"  width="10%" id="topTotal"> </td>
+                            <td class="p-1 text-center"  width="10%" id="downTotal"> </td>
+                            <td class="p-1 text-center"  width="15%" rowspan="2"> <?php echo number_format($this->getLevTotal($id, $prog_id, $lev, 'total'), 0, '.', ''); ?> </td>
+                            <td class="p-1 text-center"  width="25%" rowspan="2"> <?php echo $this->num_to_word(intval(number_format($this->getLevTotal($id, $prog_id, $lev, 'total'), 0, '.', ''))); ?> </td>
+                            <td class="p-1 text-center"  width="5%" rowspan="2"> <?php echo $this->get_gpa(number_format((float) number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'total'), 0, '.', '') /   number_format((float) $this->count_subjects_inexam_by_level($id, $prog_id, $lev), 0, '.', ''), 0, '.', '')); ?> </td>
+                        </tr>
+                    </table>
+                <?php
+                else :
                 ?>
-                <table class="print-table m-auto">
-                    <tr>
-                        <td class="p-1 alert alert-info">مجموع الدرجات:<?php echo number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'total'), 0, '.', ''); ?> </td>
-                        <td class="p-1 alert alert-info">مجموع الساعات: <?php echo number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'ex_crid'), 0, '.', ''); ?></td>
-                        <td class="p-1 alert alert-info"> النقاط الفصلية : <?php echo number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'CRGPA'), 0, '.', ''); ?> </td>
-                        <td class="p-1 alert alert-info"> التقدير الفصلي : <?php echo $this->getGradeFromPoint(number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'CRGPA'), 0, '.', '')); ?> </td>
-                        <td class="p-1 alert alert-info"> النقاط التراكمية:<?php echo number_format((float) $this->getLevGrandTotal($id, $prog_id, $lev, 'GGPA'), 0, '.', ''); ?> </td>
-                        <td class="p-1 alert alert-info"> التقدير التراكمي : <?php echo $this->getGradeFromPoint(number_format((float) $this->getLevGrandTotal($id, $prog_id, $lev, 'GGPA'), 0, '.', '')); ?> </td>
-                    </tr>
-                </table>
-            <?php
+                    <table class="print-table m-auto">
+                        <tr>
+                            <td class="p-1 text-center"  width="15%">مجموع الدرجات:<?php echo number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'total'), 0, '.', ''); ?> </td>
+                            <td class="p-1 text-center"  width="15%">مجموع الساعات: <?php echo number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'ex_crid'), 0, '.', ''); ?></td>
+                            <td class="p-1 text-center"  width="15%"> النقاط الفصلية : <?php echo number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'CRGPA'), 0, '.', ''); ?> </td>
+                            <td class="p-1 text-center"  width="15%"> التقدير الفصلي : <?php echo $this->getGradeFromPoint(number_format((float) $this->getLevTotal($id, $prog_id, $lev, 'CRGPA'), 0, '.', '')); ?> </td>
+                            <td class="p-1 text-center"  width="15%"> النقاط التراكمية:<?php echo number_format((float) $this->getLevGrandTotal($id, $prog_id, $lev, 'GGPA'), 0, '.', ''); ?> </td>
+                            <td class="p-1 text-center"  width="15%"> التقدير التراكمي : <?php echo $this->getGradeFromPoint(number_format((float) $this->getLevGrandTotal($id, $prog_id, $lev, 'GGPA'), 0, '.', '')); ?> </td>
+                        </tr>
+                    </table>
+                <?php
+                endif;
+            }
+
+
+            public function count_subjects_inexam_by_level($id, $prog_id, $lev)
+            {
+                $this->query("SELECT COUNT( ex_id ) as ex_id FROM  exams  WHERE stu_id=:stu_id AND prog_id=:prog_id  AND lev_id=:lev_id");
+                $this->bind(":stu_id", $id);
+                $this->bind(":prog_id", $prog_id);
+                $this->bind(":lev_id", $lev);
+                $row = $this->resultSet();
+                if ($row) {
+                    foreach ($row as $rows) {
+                    }
+                    return $rows['ex_id'];
+                }
             }
             public function get_gpa($totals)
             {
-                if ($total >= 96) {
+                if ($totals >= 96) {
                     $avg =  "*A";
-                } elseif ($total >= 91) {
+                } elseif ($totals >= 91) {
                     $avg =  "A";
-                } elseif ($total >= 86) {
+                } elseif ($totals >= 86) {
                     $avg =  "-A";
-                } elseif ($total >= 80) {
+                } elseif ($totals >= 80) {
                     $avg =  "*B";
-                } elseif ($total >= 75) {
+                } elseif ($totals >= 75) {
                     $avg =  "B";
-                } elseif ($total >= 70) {
+                } elseif ($totals >= 70) {
                     $avg =  "-B";
-                } elseif ($total >= 65) {
+                } elseif ($totals >= 65) {
                     $avg =  "*C";
-                } elseif ($total >= 60) {
+                } elseif ($totals >= 60) {
                     $avg =  "C";
-                } elseif ($total >= 55) {
+                } elseif ($totals >= 55) {
                     $avg =  "-C";
-                } elseif ($total >= 50) {
+                } elseif ($totals >= 50) {
                     $avg =  "D";
                 } else {
                     $avg =  "F";
                 }
-                 return $avg;
+                return $avg;
             }
             public function getPoint($totals)
             {
@@ -1374,7 +1920,7 @@
 
             public function getcurrentFeeInfo($id, $amount, $Discount)
             {
-            ?>
+                ?>
                 إجمالي المدفوع
                 <?php
                 echo ($this->getallstupaidFeeCuLev($id, $amount) > 0)  ? $this->getallstupaidFeeCuLev($id, $amount) : 0; ?>
@@ -1529,35 +2075,7 @@
             }
 
 
-            public function getusr_lev($val)
-            {
-                if ($val == "manager") :
-                    return '<option value="manager">مدير</option>
-                            <option value="finance"> محاسب </option>
-                            <option value="admin"> الشؤون الإدارية </option>
-                            <option value="students_Affairs"> شؤون الطلاب </option>';
-                elseif ($val == "finance") :
-                    return '<option value="finance"> محاسب </option>
-                            <option value="manager">مدير</option>
-                            <option value="admin"> الشؤون الإدارية </option>
-                            <option value="students_Affairs"> شؤون الطلاب </option>';
-                elseif ($val == "admin") :
-                    return '<option value="admin"> الشؤون الإدارية </option>
-                            <option value="manager">مدير</option>
-                            <option value="finance"> محاسب </option>
-                            <option value="students_Affairs"> شؤون الطلاب </option>';
-                elseif ($val == "manager") :
-                    return '<option value="students_Affairs"> شؤون الطلاب </option>
-                            <option value="manager">مدير</option>
-                            <option value="finance"> محاسب </option>
-                            <option value="admin"> الشؤون الإدارية </option>';
-                else :
-                    return '<option value="manager">مدير</option>
-                            <option value="finance"> محاسب </option>
-                            <option value="admin"> الشؤون الإدارية </option>
-                            <option value="students_Affairs"> شؤون الطلاب </option>';
-                endif;
-            }
+
 
             /** =========================================================== */
             /** EMPLOYEE information **/ /** emp information  */
@@ -1565,7 +2083,14 @@
 
             public function getempList()
             {
-                $this->query("SELECT * FROM empinfo WHERE emp_stustatus=1");
+                $id = $_GET['id'];
+
+                if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                    $this->query("SELECT * FROM empinfo");
+                else :
+                    $this->query("SELECT DISTINCT empinfo.emp_id as emp_id ,empinfo.emp_name as emp_name FROM empinfo RIGHT JOIN empdistribution ON empinfo.emp_id = empdistribution.emp_id LEFT JOIN auth_roles ON empdistribution.prog_id = auth_roles.prog_id WHERE   auth_roles.usrid =:usrid ");
+                    $this->bind(":usrid", $_SESSION['log_id']);
+                endif;
                 $row = $this->resultSet();
                 if ($row) {
                     foreach ($row as $item) {
@@ -1576,8 +2101,14 @@
 
             public function getempinfoById($id, $val)
             {
-                $this->query("SELECT * FROM empinfo WHERE emp_id=:id");
-                $this->bind(":id", $id);
+                if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                    $this->query("SELECT * FROM empinfo WHERE emp_id=:id");
+                    $this->bind(":id",  $id);
+                else :
+                    $this->query("SELECT DISTINCT empinfo.emp_id as emp_id ,empinfo.emp_name as emp_name FROM empinfo RIGHT JOIN empdistribution ON empinfo.emp_id = empdistribution.emp_id LEFT JOIN auth_roles ON empdistribution.prog_id = auth_roles.prog_id WHERE empinfo.emp_id=:id AND    auth_roles.usrid =:usrid ");
+                    $this->bind(":id",  $id);
+                    $this->bind(":usrid", $_SESSION['log_id']);
+                endif;
                 $row = $this->resultSet();
                 if ($row) {
                     foreach ($row as $item) {
@@ -1591,7 +2122,20 @@
 
             public function getempDept()
             {
-                $this->query("SELECT * FROM emp_debt ORDER BY emp_debt_id DESC");
+                if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                    $this->query("SELECT * FROM emp_debt");
+                else :
+                    $this->query("
+                                    SELECT DISTINCT emp_debt.emp_debt_id as emp_debt_ids , emp_debt.*  FROM emp_debt
+                                    LEFT JOIN  empdistribution
+                                    ON emp_debt.emp_id = empdistribution.emp_id
+                                    right JOIN  auth_roles
+                                    ON empdistribution.prog_id = auth_roles.prog_id
+                                    WHERE empdistribution.prog_id IS NOT NULL
+                                    AND auth_roles.usrid = :usrid
+                    ");
+                    $this->bind(":usrid", $_SESSION['log_id']);
+                endif;
                 $row = $this->resultSet();
                 if ($row) {
                     return $this->resultSet();
@@ -1738,7 +2282,18 @@
             /** =========================================================== */
             public function getemp_allowance()
             {
-                $this->query("SELECT * FROM emp_allowance ORDER BY  emp_allowance_id DESC");
+                if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                    $this->query("SELECT * FROM emp_allowance");
+                else :
+                    $this->query("SELECT DISTINCT emp_allowance.emp_allowance_id as emp_allowance_ids , emp_allowance.*  FROM emp_allowance
+                                    LEFT JOIN  empdistribution
+                                    ON emp_allowance.emp_id = empdistribution.emp_id
+                                    right JOIN  auth_roles
+                                    ON empdistribution.prog_id = auth_roles.prog_id
+                                    WHERE empdistribution.prog_id IS NOT NULL
+                                    AND auth_roles.usrid = :usrid");
+                    $this->bind(":usrid", $_SESSION['log_id']);
+                endif;
                 $row = $this->resultSet();
                 if ($row) {
                     return $this->resultSet();
@@ -1747,7 +2302,7 @@
 
             public function getEmpallowanceoUpdate($id)
             {
-                $this->query("SELECT * FROM emp_allowance  WHERE   emp_allowance_id=:id");
+                $this->query("SELECT * FROM emp_allowance  WHERE emp_allowance_id=:id");
                 $this->bind(":id", $id);
                 $row = $this->resultSet();
                 if ($row) {
@@ -1760,7 +2315,19 @@
 
             public function getemp_deductiont()
             {
-                $this->query("SELECT * FROM emp_deductiont ORDER BY  emp_deductiont_id DESC");
+
+                if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                    $this->query("SELECT * FROM emp_deductiont ORDER BY  emp_deductiont_id DESC");
+                else :
+                    $this->query("SELECT DISTINCT emp_deductiont.emp_deductiont_id  as emp_allowance_ids , emp_deductiont.*  FROM emp_deductiont
+                                    LEFT JOIN  empdistribution
+                                    ON emp_deductiont.emp_id = empdistribution.emp_id
+                                    right JOIN  auth_roles
+                                    ON empdistribution.prog_id = auth_roles.prog_id
+                                    WHERE empdistribution.prog_id IS NOT NULL
+                                    AND auth_roles.usrid = :usrid");
+                    $this->bind(":usrid", $_SESSION['log_id']);
+                endif;
                 $row = $this->resultSet();
                 if ($row) {
                     return $this->resultSet();
@@ -1796,7 +2363,7 @@
                 $row = $this->resultSet();
                 if ($row) {
                     foreach ($row as $item) {
-                        return $item['em_sec_name']  ;
+                        return $item['em_sec_name'];
                     }
                 }
             }
@@ -1868,8 +2435,7 @@
                 $row = $this->resultSet();
                 if ($row) {
                     foreach ($row as $item) {
-                    return $item['em_lev_name'];
-
+                        return $item['em_lev_name'];
                     }
                 }
             }
@@ -1922,8 +2488,6 @@
             }
             public function uploadDoc($file, $size)
             {
-
-
                 $files = $file;
                 $f_name    = $files['name'];
                 $f_tmp     = $files['tmp_name'];
@@ -1950,7 +2514,7 @@
                     $_SESSION['msg']  = FILE_TYPE_ERR;
                 }
             }
-            public function uploadFiles($file,$exe,$size )
+            public function uploadFiles($file, $file_type, $size)
             {
 
 
@@ -1959,15 +2523,13 @@
                 $f_tmp     = $files['tmp_name'];
                 $f_size    = $files['size'];
                 $f_error   = $files['error'];
-                $f_exe     = explode('.', $f_name);
-                $f_exe     = strtolower(end($f_exe));
-                $f_allow   = array($exe);
-                if (in_array($f_exe, $f_allow)) {
+                $file_type = pathinfo($f_name, PATHINFO_EXTENSION);
+                $f_allow   = array("jpeg", "jpg", "png",  "gif");
+                if (in_array($file_type, $f_allow)) {
                     if ($f_error === 0) {
                         if ($f_size < $size) {
                             $f_upload_dir =   getcwd() . "/uplouds/";
-                            $f_origenal_tmp = "";
-                            if (move_uploaded_file($f_tmp, $f_upload_dir . $f_name)) {
+                            if (move_uploaded_file($f_tmp, $f_upload_dir . $this->random_string(20) . "." . $file_type)) {
                                 $_SESSION['msg'] = SUCCESS;
                             }
                         } else {
@@ -2564,8 +3126,8 @@
                 $this->bind(":closDate", $closDate);
                 $this->bind(":Dfrm", $Dfrm);
                 $this->bind(":DTo",  $DTo);
-                if($this->execute()){
-                    echo "<br> تم اغلاق حساب علاوات الموظفين "; 
+                if ($this->execute()) {
+                    echo "<br> تم اغلاق حساب علاوات الموظفين ";
                 }
 
                 /** =============================================================== */
@@ -2573,8 +3135,8 @@
                 $this->bind(":closDate", $closDate);
                 $this->bind(":Dfrm", $Dfrm);
                 $this->bind(":DTo",  $DTo);
-                if($this->execute()){
-                    echo "<br> تم اغلاق حساب مديونيات الموظفين "; 
+                if ($this->execute()) {
+                    echo "<br> تم اغلاق حساب مديونيات الموظفين ";
                 }
 
                 /** =============================================================== */
@@ -2582,8 +3144,8 @@
                 $this->bind(":closDate", $closDate);
                 $this->bind(":Dfrm", $Dfrm);
                 $this->bind(":DTo",  $DTo);
-                if($this->execute()){
-                    echo "<br> تم اغلاق حساب الخصوم المالية للموظفين "; 
+                if ($this->execute()) {
+                    echo "<br> تم اغلاق حساب الخصوم المالية للموظفين ";
                 }
 
                 /** =============================================================== */
@@ -2591,8 +3153,8 @@
                 $this->bind(":closDate", $closDate);
                 $this->bind(":Dfrm", $Dfrm);
                 $this->bind(":DTo",  $DTo);
-                if($this->execute()){
-                    echo "<br> تم اغلاق حساب رفع مرتبات الموظفين "; 
+                if ($this->execute()) {
+                    echo "<br> تم اغلاق حساب رفع مرتبات الموظفين ";
                 }
 
                 /** =============================================================== */
@@ -2600,9 +3162,424 @@
                 $this->bind(":closDate", $closDate);
                 $this->bind(":Dfrm", $Dfrm);
                 $this->bind(":DTo",  $DTo);
-                if($this->execute()){
-                    echo "<br> تم اغلاق حساب مرتبات الموظفين "; 
+                if ($this->execute()) {
+                    echo "<br> تم اغلاق حساب مرتبات الموظفين ";
                 }
-
             }
+
+            /** get fee info  */
+            public function getfeeinfo($prog_id, $PyRes)
+            {
+                $this->query("SELECT * FROM  feeinfo WHERE  prog_id=:prog_id AND  PyRes=:PyRes");
+                $this->bind(":prog_id", $prog_id);
+                $this->bind(":PyRes", $PyRes);
+                $rows = $this->resultSet();
+                if ($rows) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+
+            /** =================================== mget header of reports */
+            public function get_report_header($title)
+            {
+                echo '<div class="container p-0">
+                            <div class="container">
+                                <img src="' . $this->siteSetting('siteUrl') . '/assets/img/printLogo.png"   class="w-100" style="height:100px;" alt="">
+                            </div>
+                            <div class="container">
+                                    <span class="float-right"> تاريخ الطباعة: ' . date("Y-M-d", time()) . '</span>
+                                    <span class="float-left">   ' . $_SESSION['log_user'] . '</span>
+                            </div>
+                        </div>
+                        
+                        <div class="clearfix"></div>
+                        <hr>
+                        <h1 class="text-center">' . $title . '</h1>';
+            }
+
+            /** =================================== mget header of reports */
+            public function get_report_footer()
+            {
+                echo '<div class="container footer text-center" pb-2 style="   position: fixed;left: 0;bottom: 15px; width: 100%;">
+                                <hr>
+                                ' . $this->siteSetting('siteAddr') . '-
+                                ' . $this->siteSetting('sitePhones') . '-
+                                ' . $this->siteSetting('siteEmail') . '
+                        </div>';
+            }
+            /**
+             * here we can give user auth 
+             * @param int usrid
+             * @param string actionname 
+             */
+
+            public function chk_auth_show(string $actionname)
+            {
+                $usrid = $_SESSION['log_id'];
+                $this->query("SELECT * FROM  auth_pages  WHERE usrid=:usrid");
+                $this->bind(":usrid", $usrid);
+                $row = $this->resultSet();
+                if ($row) {
+                    foreach ($row as $item) {
+                        return   $item[$actionname];
+                    }
+                }
+            }
+
+
+            /**
+             * here we can chk if user auth is true or false 
+             * @param string controller 
+             */
+
+            public function chk_user_auth()
+            {
+                if (!$_REQUEST['controller']) $_REQUEST['controller'] = 'home';
+                if (isset($_REQUEST['controller'])) {
+                    if (!$_REQUEST['action']) $_REQUEST['action'] = 'index';
+                    if (isset($_REQUEST['action'])) {
+                        $ac = explode(',', $this->chk_auth_show($_REQUEST['controller']));
+                        if (in_array($_REQUEST['action'], $ac)) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+
+            public function openPage()
+            {
+                if (!$this->chk_user_auth()) {
+                    die($this->err_message());
+                }
+            }
+
+
+            public function err_message()
+            {
+                $str = '<div class="alert alert-danger text-center"> عفواً، غير مسموح لك بدخول هذه الصفحة، أو  القيام بهذه العملية  </div>';
+                return $str;
+            }
+
+
+
+            /**
+             * here we can get list of all faculty
+             */
+            public function faculyList()
+            {
+                $this->query("SELECT * FROM programs ");
+                $menu = $this->resultSet();
+                return $menu;
+            }
+
+            /**
+             * here chek if userid auth_roles 
+             * @param int  $usrid 
+             * @param int  $edulev_id 
+             */
+
+            public function chk_usr_in_auth_roles(int $usrid, int $edulev_id)
+            {
+                $this->query("SELECT * FROM  auth_roles  WHERE   usrid=:usrid AND edulev_id=:edulev_id");
+                $this->bind(":usrid", $usrid);
+                $this->bind(":edulev_id", $edulev_id);
+                $data = $this->resultSet();
+                if ($data) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            /**
+             * chek if pages in user role is true or not 
+             * @param int $usrid 
+             * 
+             */
+            public function chk_if_user_rol_in(int $usrid, int $prog_id)
+            {
+
+                $this->query("SELECT * FROM  auth_roles  WHERE   usrid=:usrid AND prog_id=:prog_id");
+                $this->bind(":usrid", $usrid);
+                $this->bind(":prog_id", $prog_id);
+                $data = $this->resultSet();
+                if ($data) {
+                    foreach ($data as $item) {
+                        return  $item['prog_id'];
+                    }
+                }
+            }
+
+
+
+            /**
+             * here we can get active roles only 
+             * @param int $usrid 
+             * @param string $pages
+             */
+
+            public function chk_rols(int $usrid, int $prog_id)
+            {
+                $ar = $this->chk_if_user_rol_in($usrid,   $prog_id);
+                if ($ar) {
+                    return "checked";
+                }
+            }
+
+            /**
+             * here we can get active roles only 
+             * @param int $usrid 
+             * @param string $pages
+             */
+
+            public function chk_rols_for_current_user(int $usrid, int $prog_id)
+            {
+                $this->query("SELECT * FROM  auth_roles  WHERE   usrid=:usrid AND prog_id=:prog_id");
+                $this->bind(":usrid", $usrid);
+                $this->bind(":prog_id", $prog_id);
+                $data = $this->resultSet();
+                if ($data) {
+                    return "checked";
+                }
+            }
+            /**
+             * here we can get active roles only 
+             * @param int $usrid 
+             * @param string $pages
+             */
+
+            public function chk_prog_rols(int $usrid, int $prog_id)
+            {
+                if ($_SESSION['log_role']  == 'manager' ||    $_SESSION['log_role']  == 'admin') :
+                    $this->query("SELECT * FROM  auth_roles ORDER BY prog_id DESC");
+                else :
+                    $this->query("SELECT DISTINCT subject.sub_id as sub_ids , subject.* from subject 
+                                            LEFT JOIN programs 
+                                            on subject.prog_id = programs.prog_id 
+                                            LEFT JOIN auth_roles 
+                                            on subject.prog_id = auth_roles.prog_id 
+                                            WHERE   auth_roles.usrid=:usrid AND auth_roles.prog_id=:prog_id");
+                    $this->bind(":usrid", $usrid);
+                    $this->bind(":prog_id", $prog_id);
+                endif;
+                $row = $this->resultSet();
+                if ($row) {
+                    return true;
+                }
+            }
+
+
+
+
+            /**
+             * here we can add new user role 
+             * @param int $usrid 
+             * @param string $pages 
+             */
+            public function chkroles(int $usrid, string $main_pages)
+            {
+                $this->query("SELECT  * FROM  auth_pages  WHERE main_pages=:main_pages AND usrid=:usrid");
+                $this->bind(":main_pages",  $main_pages);
+                $this->bind(":usrid", $usrid);
+                $row = $this->resultSet();
+                if ($row) {
+                    foreach ($row as $item) {
+                        return   $item['sub_pages'];
+                    }
+                }
+            }
+
+            /**
+             * here we can get active roles only 
+             * @param int $usrid 
+             * @param string $pages
+             */
+
+            public function chk_pages_rols(int $usrid, string $main_pages, string $pages)
+            {
+                $ar = explode(',', $this->chkroles($usrid, $main_pages));
+                if (in_array($pages, $ar)) {
+                    return "checked";
+                }
+            }
+
+
+            /**
+             * chek if pages in user role is true or not 
+             * @param int $usrid 
+             * 
+             */
+            public function chk_if_user_rol_pages_in(int $usrid, string $main_pages)
+            {
+                $this->query("SELECT  * FROM  auth_pages  WHERE main_pages=:main_pages AND usrid=:usrid");
+                $this->bind(":main_pages",  $main_pages);
+                $this->bind(":usrid", $usrid);
+                $row = $this->resultSet();
+                if ($row) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+
+
+            /**
+             * chek if pages in user role is true or not 
+             * @param int $usrid 
+             * 
+             */
+            public function open_page()
+            {
+                $this->query("SELECT  * FROM  auth_pages  WHERE main_pages=:main_pages AND usrid=:usrid");
+                $this->bind(":main_pages",  $_GET['controller']);
+                $this->bind(":usrid", $this->stringify($_SESSION['log_id']));
+                $row = $this->resultSet();
+                if ($row) {
+                    foreach ($row as $item) {
+                        $ar = explode(',', $this->chkroles($_SESSION['log_id'], $_GET['controller']));
+                        if (in_array($_GET['action'], $ar)) {
+                            die($this->err_message());
+                        }
+                    }
+                }
+            }
+
+            /**
+             * here we can customize a report 
+             */
+
+            public function customize_report()
+            {
+                if (isset($_GET['prog_id'])) {
+                    $prog_id = $_GET['prog_id'];
+                    if ($this->get_report_type($prog_id)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+
+
+            public function chek_empdistribution(int $emp_id, int $pro_id)
+            {
+                $this->query("SELECT * FROM  empdistribution  WHERE emp_id=:emp_id AND prog_id=:pro_id");
+                $this->bind(":emp_id", $emp_id);
+                $this->bind(":pro_id", $pro_id);
+                $row = $this->resultSet();
+                if ($row) {
+                    return true;
+                }
+            }
+
+
+
+            public function chked_empdistribution(int $emp_id, int $pro_id)
+            {
+                if ($this->chek_empdistribution($emp_id,   $pro_id)) {
+                    return "checked";
+                }
+            }
+
+            public function random_string($length)
+            {
+                $key = '';
+                $keys = array_merge(range(0, 9), range('a', 'z'));
+
+                for ($i = 0; $i < $length; $i++) {
+                    $key .= $keys[array_rand($keys)];
+                }
+                return $key;
+            }
+
+
+
+            /**
+             * here we can get type of report to select 
+             */
+            public function get_report_type_txt(int $prog_id)
+            {
+                $this->query("SELECT * FROM  exam_reports  WHERE prog_id=:prog_id");
+                $this->bind(":prog_id", $prog_id);
+                $row = $this->resultSet();
+                if ($row) {
+                    foreach ($row as $item) {
+                        return $item['report'];
+                    }
+                }
+            }
+
+
+            public function get_report_type(int $prog_id)
+            {
+                $this->query("SELECT * FROM  exam_reports  WHERE prog_id=:prog_id");
+                $this->bind(":prog_id", $prog_id);
+                $row = $this->resultSet();
+                if ($row) {
+                    return true;
+                }
+            }
+
+
+            public function check_report_type(int $prog_id)
+            {
+                if ($this->get_report_type($prog_id)) {
+                    return "checked";
+                }
+            }
+
+
+            public function get_courses_info_txt(int $cou_id ,$val)
+            {
+                $this->query("SELECT * FROM   courses   WHERE cou_id=:cou_id");
+                $this->bind(":cou_id", $cou_id);
+                $row = $this->resultSet();
+                if ($row) {
+                    foreach($row as $item){
+                        return $item[ $val ];
+                    }
+                }                
+            }
+
+            public function delete_all_coulesson(int $cou_id)
+            {
+                $this->query("DELETE FROM  cou_lesson  WHERE  cou_id=:cou_id");
+                $this->bind(":cou_id", $cou_id);
+                $this->execute();
+            }
+
+
+            public function get_next_coulesson (int $les_id, int $cou_id)
+            {
+                $this->query("SELECT * FROM  cou_lesson  WHERE  les_id > :id AND cou_id=:cou_id LIMIT 1");
+                $this->bind(":id", $les_id);
+                $this->bind(":cou_id", $cou_id);
+                $row = $this->resultSet();
+                if($row){
+                    foreach($row as $item){
+                        return "<a href='".ROOT_URL."/coulesson/show/".$item['les_id'] ."' class='btn danger-color-dark py-2 px-3 text-white'> الدرس التالي</a>";
+                    }
+                }
+            }
+
+            public function get_previous_coulesson(int $les_id,int $cou_id)
+            {
+                $this->query("SELECT * FROM  cou_lesson  WHERE  les_id < :id AND cou_id=:cou_id LIMIT 1");
+                $this->bind(":id", $les_id);
+                $this->bind(":cou_id", $cou_id);
+                $row = $this->resultSet();
+                if ($row) {
+                    foreach ($row as $item) {
+                        return "<a href='" . ROOT_URL . "/coulesson/show/" . $item['les_id'] . "' class='btn danger-color-dark py-2 px-3 text-white'> الدرس السابق</a>";
+                    }
+                }
+            }
+
         }

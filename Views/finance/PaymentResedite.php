@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: تعديل جهة دفع
+ */
+?>
 <?php $item = json_decode($viewmodel); ?>
 <?php if (count((array) $item) > 0) : ?>
     <?php foreach ($item as $key => $val) : ?>

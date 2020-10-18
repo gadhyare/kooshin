@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: رئيسية معلومات الطلبة
+ */
+?>
 <div class="container mt-5 p-3">
     <div class="row">
         <div class="col-4 col-md-1 col-lg-2 mt-2   text-center">
@@ -14,7 +20,7 @@
                 </a>
             </div>
         </div>
-         
+
         <div class="col-4 col-md-1 col-lg-2 mt-2   text-center">
             <div class="card-body bg-white z-depth-2 p-1 text-center">
                 <a href="<?php echo ROOT_URL; ?>/student/stuinfolist">
@@ -36,6 +42,6 @@
                 </a>
             </div>
         </div>
-        
+
     </div>
 </div>

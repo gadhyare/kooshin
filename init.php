@@ -42,7 +42,12 @@ Route::Route('Models/settings' );
 Route::Route('Models/edulevel' );
 Route::Route('Models/usrprofile' );
 Route::Route('Models/employees' );
+Route::Route('Models/filemanager');
 Route::Route('Models/baninfo' );
+Route::Route('Models/courses');
+Route::Route('Models/coulesson');
+
+
 
 /*********************************** Controllers */
  
@@ -66,4 +71,7 @@ Route::Route('Controllers/settings' );
 Route::Route('Controllers/edulevel' );
 Route::Route('Controllers/usrprofile' );
 Route::Route('Controllers/employees' );
+Route::Route('Controllers/filemanager' );
 Route::Route('Controllers/baninfo' );
+Route::Route('Controllers/courses');
+Route::Route('Controllers/coulesson');

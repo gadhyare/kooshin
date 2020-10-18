@@ -1,4 +1,9 @@
-<?php $id = (isset($_GET['id'])) ? $_GET['id'] : ''; ?>
+<?php
+
+/**
+ * fileName:   اضافة  وظيفة  موظف
+ */
+?><?php $id = (isset($_GET['id'])) ? $_GET['id'] : ''; ?>
 <?php if ($id) : ?>
     <form action="<?php $_SERVER['PHP_SELF']; ?>" method="POST" enctype="multipart/form-data">
         <?php $op = new Khas(); ?>
@@ -14,7 +19,7 @@
                         <div class="form-group">
                             <label for="em_sec_id"> القسم الوظيفي </label>
                             <select name="em_sec_id" id="em_sec_id" class="form-control p-0 rounded-0 alert alert-info">
-                                <?php   $op->getEmpSec(); ?>
+                                <?php $op->getEmpSec(); ?>
                             </select>
                         </div>
                         <div class="form-group">
@@ -25,11 +30,11 @@
                         </div>
                         <div class="form-group">
                             <label for="empjob_strdate">تاريخ التعيين</label>
-                            <input type="date" name="empjob_strdate" id="empjob_strdate" class="form-control p-0 rounded-0 alert alert-info"  required  >
+                            <input type="date" name="empjob_strdate" id="empjob_strdate" class="form-control p-0 rounded-0 alert alert-info" required>
                         </div>
                         <div class="form-group">
                             <label for="empjob_sellary">المرتب الأساسي</label>
-                            <input type="number" name="empjob_sellary" id="empjob_sellary" class="form-control p-0 rounded-0 alert alert-info" required >
+                            <input type="number" name="empjob_sellary" id="empjob_sellary" class="form-control p-0 rounded-0 alert alert-info" required>
                         </div>
                         <div class="form-group">
                             <label for="empjob_levdate">تاريخ ترك الوظيفة</label>

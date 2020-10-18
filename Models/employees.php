@@ -220,9 +220,14 @@
                 $_SESSION['msg'] = SUCCESS;
                 header("refresh:0;url=" . ROOT_URL . "/employees/empinfo");
             }
-
-            $this->query("SELECT * FROM empinfo WHERE emp_id=:id");
+            if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                $this->query("SELECT * FROM empinfo WHERE emp_id=:id");
+                $this->bind(":id",  $id);
+            else :
+            $this->query("SELECT DISTINCT * FROM empinfo RIGHT JOIN empdistribution ON empinfo.emp_id = empdistribution.emp_id left JOIN auth_roles ON empdistribution.emp_id = auth_roles.prog_id WHERE empinfo.emp_id=:id AND auth_roles.usrid =:usrid ");
             $this->bind(":id",  $id);
+            $this->bind(":usrid", $_SESSION['log_role']);
+            endif;
             $row = $this->resultSet();
             if ($row) {
                 return $this->resultSet();
@@ -240,7 +245,7 @@
             if (isset($_POST['update_empInfo'])) {
                 $this->query("UPDATE empinfo SET emp_name=:emp_name,emp_gender=:emp_gender,emp_DOB=:emp_DOB,emp_POB=:emp_POB,
                 emp_nationality=:emp_nationality,emp_address=:emp_address,emp_phones=:emp_phones,emp_email=:emp_email,
-                emp_regDate=:emp_regDate,emp_pic=:emp_pic,empsellary=:empsellary,emp_note=:emp_note,emp_stustatus=:emp_stustatus WHERE emp_id=:id");
+                emp_regDate=:emp_regDate,emp_pic=:emp_pic, emp_note=:emp_note,emp_stustatus=:emp_stustatus WHERE emp_id=:id");
                 $this->bind(":id",  $id);
                 $this->bind(":emp_name", $_POST['emp_name']);
                 $this->bind(":emp_gender", $_POST['emp_gender']);
@@ -252,7 +257,7 @@
                 $this->bind(":emp_email", $_POST['emp_email']);
                 $this->bind(":emp_regDate", $_POST['emp_regDate']);
                 $this->bind(":emp_pic", $_FILES['emp_pic']['name']);
-                $this->bind(":empsellary", $_POST['empsellary']);
+                //his->bind(":empsellary", $_POST['empsellary']);
                 $this->bind(":emp_note", $_POST['emp_note']);
                 $this->bind(":emp_stustatus", $_POST['emp_stustatus']);
                 $this->execute();
@@ -261,8 +266,14 @@
             }
 
 
-            $this->query("SELECT * FROM empinfo WHERE emp_id=:id");
-            $this->bind(":id",  $id);
+            if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                $this->query("SELECT * FROM empinfo WHERE emp_id=:id");
+                $this->bind(":id",  $id);
+            else :
+                $this->query("SELECT DISTINCT * FROM empinfo RIGHT JOIN empdistribution ON empinfo.emp_id = empdistribution.emp_id left JOIN auth_roles ON empdistribution.emp_id = auth_roles.prog_id WHERE empinfo.emp_id=:id AND auth_roles.usrid =:usrid ");
+                $this->bind(":id",  $id);
+                $this->bind(":usrid", $_SESSION['log_role']);
+            endif;
             $row = $this->resultSet();
             if ($row) {
                 return $this->resultSet();
@@ -277,9 +288,14 @@
     {
         $id = $_GET['id'];
         if ($id) {
-            $op = new Khas();
-            $this->query("SELECT * FROM empinfo WHERE emp_id=:id");
-            $this->bind(":id",  $id);
+            if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                $this->query("SELECT * FROM empinfo WHERE emp_id=:id");
+                $this->bind(":id",  $id);
+            else :
+                $this->query("SELECT DISTINCT * FROM empinfo RIGHT JOIN empdistribution ON empinfo.emp_id = empdistribution.emp_id left JOIN auth_roles ON empdistribution.emp_id = auth_roles.prog_id WHERE empinfo.emp_id=:id AND auth_roles.usrid =:usrid ");
+                $this->bind(":id",  $id);
+                $this->bind(":usrid", $_SESSION['log_role']);
+            endif;
             $row = $this->resultSet();
             if ($row) {
                 return $this->resultSet();
@@ -786,5 +802,48 @@
 
 
 
+    public function empdistribution()
+    {
+        if (isset($_POST['seledulev_id'])) {
+            header("refresh:0;url=" . ROOT_URL . "/employees/empdistribution?edulev_id=" . $_POST['edulev_id']);
+        }
+        if (isset($_POST['pro_id'])) {
+            header("refresh:0;url=" . ROOT_URL . "/employees/empdistribution?edulev_id=" . $_GET['edulev_id'] . "&pro_id=" . $_POST['pro_id']);
+        }
+
+        if(isset($_GET['pro_id']) && isset($_GET['edulev_id']) && isset($_GET['emp_name'] )){
+            $ex = explode(",", $_GET['emp_name']);
+            $op = new Khas();
+            foreach($ex as $item){
+                if($op->chek_empdistribution($item , $_GET['pro_id'])){
+                    continue;
+                }
+                $this->query("INSERT INTO  empdistribution ( emp_id , prog_id ) VALUES ( :emp_id ,  :prog_id )");
+                $this->bind(":emp_id" , $item);
+                $this->bind(":prog_id", $_GET['pro_id']);
+                $this->execute();
+            }
+            if($this->lastInsertId()){
+                $_SESSION['msg'] = SUCCESS;
+            }
+        }
+
+        if (isset($_GET['pro_id']) && isset($_GET['edulev_id']) && isset($_GET['emp_id']) && isset($_GET['del']) && $_GET['del'] =  true) {
+            $this->query("DELETE FROM  empdistribution  WHERE emp_id=:emp_id AND  prog_id=:prog_id  ");
+            $this->bind(":emp_id", $_GET['emp_id']);
+            $this->bind(":prog_id", $_GET['pro_id']);
+            $this->execute();
+            $_SESSION['msg'] = SUCCESS;
+        }
+
+
+        if (isset($_GET['pro_id'])) {
+            $this->query('SELECT * FROM empinfo');
+            $rows = $this->resultSet();
+            return json_encode($rows);
+        }
+    }
+
+ 
     
 }

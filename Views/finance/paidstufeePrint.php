@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: سند قبض رسوم
+ */
+?>
 <br>
 <br>
 <div class="container print-page">
@@ -49,7 +55,7 @@
         <td> التاريخ </td>
         <td> الخصم </td>
         <td> المدفوع </td>
-        <td> ملاحظات </td>
+        <td> المتبقي </td>
     </thead>
     <tbody>
         <?php $i = 1; ?>
@@ -69,7 +75,7 @@
             <td colspan="3"> الإجمالي </td>
             <td style="width:15%"> $<?php echo $op->getallstupaidFeeCuLev($_GET['id'], 'Discount'); ?> </td>
             <td style="width:10%"> <span id="totPaid"> <?php echo $op->getallstupaidFeeCuLev($_GET['id'], 'amount') ?> </span>$ </td>
-            <td style="width:10%"> إجمالي المتقي: <span id="totPlance"> </span> $ </td>
+            <td style="width:10%"> <span id="totPlance"> </span> $ </td>
         </tr>
     </tfoot>
 

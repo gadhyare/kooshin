@@ -1,7 +1,13 @@
+<?php
+
+/**
+ * fileName: طباعة تقرير مدفوعات طالب
+ */
+?>
 <br>
 <br>
 <div class="container print-page">
-    <?php   $op = new Khas(); ?>
+    <?php $op = new Khas(); ?>
     <div class="header-section">
         <div class="logo-section">
             <img src="<?php echo $op->siteSetting('siteUrl'); ?>/uplouds/<?php echo $op->siteSetting('siteLogo'); ?>" style="height:150px; width:150px;" class="rounded-circle p-0" alt="">
@@ -116,11 +122,10 @@
 
 
 <script>
+    window.print();
 
-window.print();
-         
-   
-         window.addEventListener('afterprint', (event) => {
-             window.close();
-         });
+
+    window.addEventListener('afterprint', (event) => {
+        window.close();
+    });
 </script>

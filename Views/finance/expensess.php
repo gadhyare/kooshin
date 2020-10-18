@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: المصروفات
+ */
+?>
 <div class="container">
     <div class="row">
         <?php $op = new Khas(); ?>
@@ -53,11 +59,11 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                    <label for="acc_mov"> رقم الحساب </label>
-                                    <select name="acc_mov" id="acc_mov" class="form-control rounded-0 p-0">
-                                        <?php $op->getBankDataList(); ?>
-                                    </select>
-                                </div>
+                                <label for="acc_mov"> رقم الحساب </label>
+                                <select name="acc_mov" id="acc_mov" class="form-control rounded-0 p-0">
+                                    <?php $op->getBankDataList(); ?>
+                                </select>
+                            </div>
                             <div class="form-group">
                                 <label for="expensess_date"> التاريخ </label>
                                 <input type="date" name="expensess_date" id="expensess_date" class="form-control p-0 alert-info rounded-0" required>
@@ -95,7 +101,7 @@
                             <?php foreach ((array) $r as $empExpeness) : ?>
                                 <tr>
                                     <td class="p-1"> <a href="#" data-toggle="tooltip" title="<?php echo $empExpeness['expensess_note']; ?>"><?php echo $i++; ?></a> </td>
-                                    <td class="p-1"> <?php echo $op->getSelexptypetxt($empExpeness['exptypeid']); ?>  </td>
+                                    <td class="p-1"> <?php echo $op->getSelexptypetxt($empExpeness['exptypeid']); ?> </td>
                                     <td class="p-1"> <?php echo $empExpeness['expensess_date']; ?> </td>
                                     <td class="p-1 text-center"> $<?php echo $empExpeness['expensess_amount']; ?> </td>
                                     <td class="p-1 text-center">

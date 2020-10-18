@@ -18,7 +18,12 @@
     {
         $view = 'Views/' . get_class($this) . '/' . $this->action . '.php';
         if($fullview) {
-            require('Views/main.php');
+            try{
+                require('Views/main.php');
+            }catch(Exception $e){
+                $_SESSION['err_page'] = "ss";
+            }
+            
         } else {
             require('Views/secmain.php');
         }

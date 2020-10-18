@@ -123,22 +123,39 @@
 
     public function feeinfoadd()
     {
-        if (isset($_POST['addnewrec'])) {
-            if (empty($_POST['fee_amount'])) {
-                $_SESSION['msg'] = ERR_EMPTY;
-            } elseif (!is_numeric($_POST['fee_amount'])) {
-                $_SESSION['msg'] = ERR_NUMBER;
-            } else {
-                $this->query('INSERT INTO feeinfo(Pay_Res_id, prog_id ,  fee_amount, active) VALUES (:Pay_Res_id, :prog_id,  :fee_amount, :active)');
-                $this->bind(":Pay_Res_id", $_POST['PaymentRes']);
-                $this->bind(":prog_id", $_POST['prog_id']);
-                $this->bind(":fee_amount", $_POST['fee_amount']);
-                $this->bind(":active", $_POST['active']);
-                $this->execute();
-                if ($this->lastInsertId()) {
-                    $_SESSION['msg'] = SUCCESS;
+        if (isset($_POST['seledulev_id'])) {
+            header("refresh:0;url=" . ROOT_URL . "/finance/feeinfoadd?edulev_id=" . $_POST['edulev_id']);
+        }
+
+        if (isset($_POST['addnewfee'])) {
+            if (isset($_REQUEST['selectServices'])) {
+                $req =  $_REQUEST['selectServices'];
+                if (empty($_POST['fee_amount'])) {
+                    $_SESSION['msg'] = ERR_EMPTY;
+                } elseif (!is_numeric($_POST['fee_amount'])) {
+                    $_SESSION['msg'] = ERR_NUMBER;
+                } else {
+                    foreach ($req as $data) {
+                        $this->query('INSERT INTO feeinfo(Pay_Res_id, prog_id ,  fee_amount, active) VALUES (:Pay_Res_id, :prog_id,  :fee_amount, :active)');
+                        $this->bind(":Pay_Res_id", $_POST['PaymentRes']);
+                        $this->bind(":prog_id", $data);
+                        $this->bind(":fee_amount", $_POST['fee_amount']);
+                        $this->bind(":active", 1);
+                        $this->execute();
+
+                    }
+                    if ($this->lastInsertId()) {
+                        $_SESSION['msg'] = SUCCESS;
+                    }
                 }
             }
+
+        }
+        if (isset($_GET['edulev_id'])) {
+            $this->query('SELECT * FROM programs WHERE edulev_id=:edulev_id');
+            $this->bind(":edulev_id", $_GET['edulev_id']);
+            $rows = $this->resultSet();
+            return  json_encode($rows);
         }
     }
 
@@ -163,6 +180,8 @@
                 $_SESSION['msg'] = SUCCESS;
             }
         }
+
+
 
         $this->query('SELECT * FROM feeinfo WHERE feeinfo_id=:id');
         $this->bind(':id',  $_GET['id']);
@@ -203,6 +222,11 @@
             $this->bind(":prog_id", $_GET['id']);
             $item = $this->resultSet();
             foreach ((array) $item as $upFee) {
+                if ($upFee['Prog_Discount'] == 0) {
+                    $want =  $op->getFeeamout($_GET['prog_id'], $_POST['PyRes']);
+                } else {
+                    $want = $op->getFeeamout($_GET['prog_id'], $_POST['PyRes']) - $upFee['Prog_Discount'];
+                }
                 $this->query("INSERT INTO paymentinfo(lev_id, grp_id, sec_id, dep_id, prog_id, Pay_Res_id, stu_id, want, Discount, AccountStatuse, AccountClase, AccountOppDate) 
                 VALUES (:lev_id,:grp_id,:sec_id,:dep_id,:prog_id,:Pay_Res_id,:stu_id,:want,:Discount,:AccountStatuse,:AccountClase,:AccountOppDate)");
                 $this->bind(":lev_id", $upFee['lev_id']);
@@ -212,7 +236,7 @@
                 $this->bind(":prog_id", $upFee['prog_id']);
                 $this->bind(":Pay_Res_id", $_POST['PyRes']);
                 $this->bind(":stu_id", $upFee['stu_id']);
-                $this->bind(":want", ($_POST['activeDisc'] == 1) ? ($upFee['Prog_Discount'] == 0) ? $op->getFeeamout($_GET['prog_id'], $_POST['PyRes'])  : $op->getFeeamout($_GET['prog_id'], $_POST['PyRes']) - $upFee['Prog_Discount'] :  $op->getFeeamout($_GET['prog_id'], $_POST['PyRes']));
+                $this->bind(":want",  $want);
                 $this->bind(":Discount", 0);
                 $this->bind(":AccountStatuse", 1);
                 $this->bind(":AccountClase", 1);
@@ -286,10 +310,13 @@
     public function feepaid()
     {
 
-        $this->query("SELECT * FROM paymentinfo");
+        if(isset($_GET['id'])){
+            $this->query("SELECT * FROM paymentinfo WHERE stu_id=:id");
+        $this->bind(":id" , $_GET['id']);
         $row = $this->resultSet();
         if ($row) {
             return json_encode($row);
+        }
         }
     }
 
@@ -347,7 +374,8 @@
                 return json_encode($row);
             } else {
                 $_SESSION['msg'] = Data_Not_Founded;
-            } else :
+            }
+        else :
             $_SESSION['msg'] = Data_Not_Founded;
         endif;
     }
@@ -376,7 +404,8 @@
                 return $row;
             } else {
                 $_SESSION['msg'] = Data_Not_Founded;
-            } else :
+            }
+        else :
             $_SESSION['msg'] = Data_Not_Founded;
         endif;
     }
@@ -401,7 +430,8 @@
                 return $row;
             } else {
                 $_SESSION['msg'] = Data_Not_Founded;
-            } else :
+            }
+        else :
             $_SESSION['msg'] = Data_Not_Founded;
         endif;
     }
@@ -439,7 +469,8 @@
                 return $row;
             } else {
                 $_SESSION['msg'] = Data_Not_Founded;
-            } else :
+            }
+        else :
             $_SESSION['msg'] = Data_Not_Founded;
         endif;
     }
@@ -471,7 +502,8 @@
                 return  $row;
             } else {
                 $_SESSION['msg'] = Data_Not_Founded;
-            } else :
+            }
+        else :
             $_SESSION['msg'] = Data_Not_Founded;
         endif;
     }
@@ -721,7 +753,7 @@
                 $this->bind(":emp_debt_amount", $_POST['emp_debt_amount']);
                 $this->execute();
                 if ($this->lastInsertId()) {
-                    $op->add_to_account_mov("out", $_POST['acc_mov'] ,$_POST['emp_debt_amount'] ,  $_POST['emp_debt_date'] ,"debt-". $this->lastInsertId()   );
+                    $op->add_to_account_mov("out", $_POST['acc_mov'], $_POST['emp_debt_amount'],  $_POST['emp_debt_date'], "debt-" . $this->lastInsertId());
                     $_SESSION['msg'] = SUCCESS;
                 }
             }
@@ -733,13 +765,13 @@
             $this->bind(":emp_debt_amount", $_POST['emp_debt_amount']);
             $this->bind(":id", $_GET['ids']);
             $this->execute();
-             $op->update_to_account_mov( "out" ,"debt-".$_GET['ids'] ,$_POST['acc_mov'], $_POST['emp_debt_amount'], $_POST['emp_debt_date']);
+            $op->update_to_account_mov("out", "debt-" . $_GET['ids'], $_POST['acc_mov'], $_POST['emp_debt_amount'], $_POST['emp_debt_date']);
             $_SESSION['msg'] = SUCCESS;
         } elseif (isset($_POST['DeleteRecDept'])) {
             $this->query("DELETE FROM emp_debt  WHERE emp_debt_id=:id");
             $this->bind(":id", $_GET['ids']);
             $this->execute();
-            $op->delete_to_account_mov("debt-".$_GET['ids'] );
+            $op->delete_to_account_mov("debt-" . $_GET['ids']);
             $_SESSION['msg'] = SUCCESS;
             header("refresh:0;url=" . ROOT_URL . "/finance/empfinance?type=debt");
         }
@@ -865,8 +897,14 @@
     {
         $id = $_GET['actionmonth'];
         if ($id) {
-            $this->query("SELECT * FROM emp_sellary WHERE action_month=:action_month");
-            $this->bind(":action_month", $id);
+            if ($_SESSION['log_role'] ==  "manager" || $_SESSION['log_role'] == "admin") :
+                $this->query("SELECT * FROM emp_sellary WHERE action_month=:action_month");
+                $this->bind(":action_month", $id);
+            else :
+                $this->query("SELECT DISTINCT emp_sellary.empSellary_id  as empSellary_ids , emp_sellary.* FROM emp_sellary left JOIN empdistribution ON emp_sellary.emp_id = empdistribution.emp_id left JOIN auth_roles ON empdistribution.prog_id = auth_roles.prog_id WHERE action_month=:action_month  AND auth_roles.usrid =:usrid");
+                $this->bind(":action_month", $id);
+                $this->bind(":usrid", $_SESSION['log_id']);
+            endif;
             $row = $this->resultSet();
             if ($row) {
                 return $this->resultSet();
@@ -894,18 +932,18 @@
                     $this->execute();
                     if ($this->lastInsertId()) {
                         $op->add_to_account_mov("out", $_POST['acc_mov'], $_GET['sellery'], $_POST['PaidDate'], "empSellaryPaid-" . $this->lastInsertId());
-                        if($this->lastInsertId()){
-                            if($_POST['getemp_debt'] > 0){
-                            $this->query("INSERT INTO emp_debt(emp_id, action_month,emp_debt_date,emp_debt_amount_buy) 
+                        if ($this->lastInsertId()) {
+                            if ($_POST['getemp_debt'] > 0) {
+                                $this->query("INSERT INTO emp_debt(emp_id, action_month,emp_debt_date,emp_debt_amount_buy) 
                             VALUES (:emp_id, :action_month,:emp_debt_date,:emp_debt_amount_buy)");
-                            $this->bind(":emp_id", $_POST['emp_ids']);
-                            $this->bind(":action_month",  $_GET['action_month']);
-                            $this->bind(":emp_debt_date", $_POST['PaidDate']);
-                            $this->bind(":emp_debt_amount_buy", $_POST['getemp_debt'] ); 
-                            $this->execute();
-                            if($this->lastInsertId()){
-                                $_SESSION['msg'] = SUCCESS;
-                             }                               
+                                $this->bind(":emp_id", $_POST['emp_ids']);
+                                $this->bind(":action_month",  $_GET['action_month']);
+                                $this->bind(":emp_debt_date", $_POST['PaidDate']);
+                                $this->bind(":emp_debt_amount_buy", $_POST['getemp_debt']);
+                                $this->execute();
+                                if ($this->lastInsertId()) {
+                                    $_SESSION['msg'] = SUCCESS;
+                                }
                             }
                         }
                     }
@@ -927,6 +965,21 @@
     {
         $id = $_GET['id'];
         $op = new Khas();
+        if ($id) {
+            $this->query("SELECT * FROM emp_sellary WHERE empSellary_id=:id");
+            $this->bind(":id", $_GET['id']);
+            $row = $this->resultSet();
+            if ($row) {
+                return $this->resultSet();
+            }
+        }
+    }
+
+
+    public function empcurrentsellarypaidprint()
+    {
+        $emp_id = $_GET['id'];
+        $id = $_GET['id'];
         if ($id) {
             $this->query("SELECT * FROM emp_sellary WHERE empSellary_id=:id");
             $this->bind(":id", $_GET['id']);
@@ -1115,13 +1168,35 @@
             header("refresh:0;url=" . ROOT_URL . "/finance/bankaccountreportprint?banacc=" . $_POST['Ban_id'] . "&DFrm=" . $_POST['bandateFrom'] . "&Dto=" . $_POST['bandateTo']);
         }
 
-
-        if(isset($_POST['ClosAcc'])){
-            $ToDay = date("Y-m-d");
-            $op->closeAccounts($ToDay, $_POST['ClosdateFrom'], $_POST['ClosdateTo']) ;
+        if (isset($_POST['searchexpenseBydate']))  {
+            header("refresh:0;url=" . ROOT_URL . "/finance/searchexpensebydate?DFrm=" . $_POST['dateFrom'] . "&Dto=" . $_POST['dateTo'] . "&act=expense");
         }
+        if (isset($_POST['ClosAcc'])) {
+            $ToDay = date("Y-m-d");
+            $op->closeAccounts($ToDay, $_POST['ClosdateFrom'], $_POST['ClosdateTo']);
+        }
+
+
+
     }
 
+    
+    function searchexpensebydate()
+    {
+        if (isset($_GET['DFrm']) && isset($_GET['Dto']) && isset($_GET['act']) && $_GET['act'] == 'expense') {
+            $frmdate      = $_GET['DFrm'];
+            $todate       = $_GET['Dto'];
+            $this->query("SELECT * FROM  expensess  WHERE expensess_date BETWEEN :frmdate AND :todate");
+            $this->bind(":frmdate", $frmdate);
+            $this->bind(":todate", $todate);
+            $row = $this->resultSet();
+            if ($row) {
+                return $this->resultSet();
+            } else {
+                $_SESSION['msg'] = Data_Not_Founded;
+            }
+        }   
+    }
 
 
 
@@ -1239,7 +1314,7 @@
     public function bankaccountreportprint()
     {
         if (isset($_GET['DFrm']) && isset($_GET['Dto'])) {
-             
+
             $this->query("SELECT * FROM account_movement WHERE mov_date BETWEEN :DFrm AND :Dto");
             $this->bind(":DFrm", $_GET['DFrm']);
             $this->bind(":Dto", $_GET['Dto']);
@@ -1251,5 +1326,8 @@
             }
         }
     }
-    
+
+
+
+   
 }

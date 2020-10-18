@@ -1,4 +1,13 @@
+<?php
+
+/**
+ * fileName: تفعيل رفع الرسوم
+ */
+?>
+<?php $op = new Khas(); ?>
+<?php $op->chkSelProgtxt($_GET['prog_id']); ?>
 <?php foreach ((array) $viewmodel as $item) : ?>
+
     <div class="container col-xs-12 col-md-8 col-12 m-auto">
         <div class="card p-0 rounded-0 border-0 z-depth-1">
             <?php $op = new Khas(); ?>
@@ -7,17 +16,17 @@
             </div>
             <div class="card-body">
                 <div class="container">
-                <div class="row">
-                <div class="col-12 border">
-                            البرنامج
-                            
-                             
-                                <?php echo $op->FullSelProgInfotxt($_GET['prog_id']); ?>
-                             
-                        </div>
-                </div>
                     <div class="row">
-                        
+                        <div class="col-12 border">
+                            البرنامج
+
+
+                            <?php echo $op->FullSelProgInfotxt($_GET['prog_id']); ?>
+
+                        </div>
+                    </div>
+                    <div class="row">
+
                         <div class="col-xs-12 col-md-3">
                             الفترة
                             <hr class="p-1 mt-0 mb-0">
@@ -45,7 +54,7 @@
         <br>
         <div class="card p-0 rounded-0 border-0 z-depth-1">
             <form action="<?php $_SERVER['PHP_SELF']; ?>" method="POST" enctype="multipart/form-data">
-                <?php $op = new Khas(); ?>
+                
                 <div class="card-header text-center text-white unique-color-dark p-1">
                     معلومات الرسوم
                 </div>
@@ -70,8 +79,8 @@
                         </div>
                     </div>
                     <hr>
-                    <button type="submit" name="upLoadfee"  class="btn success-color-dark text-white px-3 py-2" >  رفع الرسوم  </button>
-                    <a href="<?php echo ROOT_URL;?>/finance/feeclasstrando"  class="btn danger-color-dark text-white float-left px-3 py-2"> إلغاء </a>
+                    <button type="submit" name="upLoadfee" class="btn success-color-dark text-white px-3 py-2"> رفع الرسوم </button>
+                    <a href="<?php echo ROOT_URL; ?>/finance/feeclasstrando" class="btn danger-color-dark text-white float-left px-3 py-2"> إلغاء </a>
                 </div>
             </form>
         </div>

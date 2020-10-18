@@ -5,13 +5,13 @@ $ip = $_SERVER['REMOTE_ADDR'];
 define('GDB_HOST', "localhost");
 define('GDB_USER', 'root');
 define('GDB_PASS', '');
-define('GDB_NAME', 'gollis');
+define('GDB_NAME', 'mini');
 define('ROOT_PATH', '/');
 define('REL_DIR', dirname(__FILE__));
 
 define("SB" ,DIRECTORY_SEPARATOR);
 
-define('ROOT_URL', rtrim('http://localhost/gollis/', '/'));
+define('ROOT_URL', rtrim('http://192.168.1.254:800/miny/', '/'));
 define('DB_ERR', '<div class="p-2 mt-2 bg-info text-white text-center">  عفواً لوجود مشكلة في قاعدة البيانات      </div>');
 define('ERR_WARNING', '<div class="p-2 mt-2 bg-danger text-white text-center">  عفواً لعدم اكتمال العملية بسبب العلة رقم      </div>');
 define('ERR_EMPTY', '<div class="p-2 mt-2 bg-warning text-dark text-center">  تأكد من ملئ جميع الحقول المطلوبة      </div>');
@@ -20,7 +20,7 @@ define('SUCCESS', '<div class="p-2 mt-2 success-color-dark text-white text-cente
 define('ERR_NUMBER', '<div class="p-2 mt-2 bg-warning text-center">  لا يسمح بادخال الأرقام       </div>');
 define('ERR_TEXT', '<div class="p-2 mt-2 bg-warning text-center">  لا يسمح بادخال الحروف       </div>');
 define('ERR_CONFIRM', '<div class="p-2 mt-2 bg-warning text-center">  الرجاء تأكيد كلمة المرور        </div>');
-define('ERR_LOGIN', '<div class="p-2 mt-2 bg-danger text-white text-center">  اسم المستخدم أو كلمة المرور خطأ        </div>');
+define('ERR_LOGIN', '<div class="p-2 mt-2 bg-danger text-white text-center">  اسم العضو أو كلمة المرور خطأ        </div>');
 define('SUCCESS_LOGIN', '<div class="p-2 mt-2 success-color-dark text-center text-white">  مرحباً بك مرة أخرى، أنت الآن في الصفحة الرئيسية        </div>');
 define('ERR_STRLEN', '<div class="p-2 mt-2 bg-danger text-center"> فضلاً كلمة المرور يجب أن تكون أكير من 6 كلمات       </div>');
 date_default_timezone_set('Asia/Kuwait');

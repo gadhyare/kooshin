@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: دفع مرتبات الموظفين
+ */
+?>
 <div class="container p-0">
     <?php $op = new Khas(); ?>
     <form action="<?php $_SERVER['PHP_SELF']; ?>" method="post">

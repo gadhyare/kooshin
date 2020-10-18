@@ -12,19 +12,16 @@
         $post = filter_input_array(INPUT_POST,FILTER_SANITIZE_STRING);
         if(isset($_POST['edit_submit'])){ 
             if($post['edulev_name_edit'] == '' ){
-                
-                $_SESSION['msg'] = ERR_EMPTY;
-                
+                $_SESSION['msg'] = ERR_EMPTY; 
             }
             elseif(is_numeric($post['edulev_name_edit'])){
-                
                 $_SESSION['msg'] = ERR_NUMBER;
-                
             }
             else{
-            $this->query('UPDATE edulevel SET  edulev_name= :edulev_name_edit,active= :active_edit WHERE edulev_id=:edulev_id');
+            $this->query('UPDATE edulevel SET  edulev_name= :edulev_name_edit,code=:code,active= :active_edit WHERE edulev_id=:edulev_id');
             $this->bind(':edulev_name_edit' ,  $post['edulev_name_edit']);
-            $this->bind(':active_edit' ,  $post['active_edit']);
+            $this->bind(':code' ,  $post['code_edit']);
+                $this->bind(':active_edit',  $post['active_edit']);
             $this->bind(':edulev_id' ,  $_GET['id']);
             $do_edit = $this->execute();
             $_SESSION['msg'] = SUCCESS;
@@ -45,9 +42,7 @@
         $post = filter_input_array(INPUT_POST,FILTER_SANITIZE_STRING);
         if(isset($_POST['submitAdd'])){
             if($post['edulev_name'] == ''){
-                
                 $_SESSION['msg'] = ERR_EMPTY;
-                
             }
             elseif(is_numeric($post['edulev_name'])){
                 
@@ -56,8 +51,9 @@
             }
             else{
 
-                $this->query('INSERT INTO edulevel( edulev_name , active) VALUES (:edulevel,:active)');
+                $this->query('INSERT INTO edulevel( edulev_name,code , active) VALUES (:edulevel,:code,:active)');
                 $this->bind(':edulevel' , $post['edulev_name']);
+                $this->bind(':edulevel', $post['code']);
                 $this->bind(':active', $post['active']);
                 $this->execute();
                 if($this->lastInsertId()){

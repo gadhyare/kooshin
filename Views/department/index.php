@@ -1,4 +1,11 @@
- <a href="<?php echo ROOT_URL; ?>/department/add" class="btn btn-primary mt-2 float-left rounded-0 mb-2 py-1 px-3"> <i class="fa fa-plus" aria-hidden="true"></i> اضافة فترة جديدة </a>
+ <?php
+  /**
+   * fileName: رئيسية الفترات
+   */
+  ?>
+ <?php $op = new Khas(); ?>
+
+ <a href="<?php echo ROOT_URL; ?>/department/add" class="btn primary-color-dark mt-2 float-left rounded-0 mb-2 py-1 px-3 text-white"> <i class="fa fa-plus" aria-hidden="true"></i> اضافة فترة جديدة </a>
  <form action="<?php $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
    <table class="table tables ">
      <thead>
@@ -19,8 +26,8 @@
            <td class="p-1"><?php echo $status; ?> </td>
            <input type="hidden" name="edit_id" value="<?php echo $dep_temes_edite['dep_id']; ?>">
            <td class="p-1">
-             <a href="<?php echo ROOT_URL; ?>/department/update/<?php echo $dep_temes_edite['dep_id']; ?>" class="btn bg-primary text-white rounded-0 py-1 px-2 "> <i class="fa fa-pencil p-0 p-0" aria-hidden="true"></i> </a>
-             <a href="<?php echo ROOT_URL; ?>/department/delete/<?php echo $dep_temes_edite['dep_id']; ?>" class="btn bg-danger text-white rounded-0 py-1 px-2 "> <i class="fa fa-trash-o" aria-hidden="true"></i> </a>
+             <a href="<?php echo ROOT_URL; ?>/department/update/<?php echo $dep_temes_edite['dep_id']; ?>" class="btn primary-color-dark text-white rounded-0 py-1 px-2 "> <i class="fa fa-pencil p-0 p-0" aria-hidden="true"></i> </a>
+             <a href="<?php echo ROOT_URL; ?>/department/delete/<?php echo $dep_temes_edite['dep_id']; ?>" class="btn danger-color-dark text-white rounded-0 py-1 px-2 "> <i class="fa fa-trash-o" aria-hidden="true"></i> </a>
            </td>
          </tr>
        <?php endforeach; ?>

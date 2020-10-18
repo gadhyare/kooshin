@@ -194,4 +194,17 @@
         $this->returnView($viewmodel->empfilesdelete(), true);
     }
 
+    protected function empdistribution()
+    {
+        $viewmodel = new employeesModel();
+        $this->returnView($viewmodel->empdistribution(), true);
+    }
+
+    protected function empdistributiondel()
+    {
+        $viewmodel = new employeesModel();
+        $this->returnView($viewmodel->empdistributiondel(), false);
+    }
+    
+
 }

@@ -1,58 +1,47 @@
+<?php
+
+/**
+ * fileName: طباعة خصم مالية موظفين
+ */
+?>
 <br>
 <br>
 <div class="container print-page">
     <?php $op = new Khas(); ?>
-    <div class="header-section">
-        <div class="logo-section">
-            <img src="<?php echo $op->siteSetting('siteUrl'); ?>/uplouds/<?php echo $op->siteSetting('siteLogo'); ?>" style="height:150px; width:150px;" class="rounded-circle p-0" alt="">
-        </div>
-        <div class="info-section">
-            <?php echo $op->siteSetting('siteName'); ?>
-            <br>
-            <?php echo $op->siteSetting('siteDisc'); ?>
-            <br>
-            <?php echo $op->siteSetting('siteAddr'); ?>
-            <br>
-            <?php echo $op->siteSetting('sitePhones'); ?>
-            <br>
-            تاريخ الطباعة: <?php echo date("Y-M-d", time()); ?>
-        </div>
-    </div>
-    <hr class="hr">
-    <h1 class="text-center"> تقرير خصم مالية الموظفين  </h1>
-    
-    <h6 class="text-center border-top"> من تاريخ: <?php echo  $_GET['DFrm'];?> حتى تاريخ: <?php echo  $_GET['Dto'];?> </h6>
+    <?php echo $op->get_report_header("تقرير خصم مالية الموظفين"); ?>
+
+    <h6 class="text-center border-top"> من تاريخ: <?php echo  $_GET['DFrm']; ?> حتى تاريخ: <?php echo  $_GET['Dto']; ?> </h6>
     <table class="print-table">
         <thead>
-            <th  class="border text-center p-1" > # </th>
-            <th  class="border text-center p-1" > اسم الموظف </th>
-            <th  class="border text-center p-1" > التاريخ </th>
-            <th  class="border text-center p-1" > سبب الخصم </th>
-            <th  class="border text-center p-1" > الشهر المالي </th>
-            <th  class="border text-center p-1" > المبلغ  </th>
+            <th class="border text-center p-1"> # </th>
+            <th class="border text-center p-1"> اسم الموظف </th>
+            <th class="border text-center p-1"> التاريخ </th>
+            <th class="border text-center p-1"> سبب الخصم </th>
+            <th class="border text-center p-1"> الشهر المالي </th>
+            <th class="border text-center p-1"> المبلغ </th>
         </thead>
         <tbody>
-            <?php $no = 1;?>
-            <?php foreach((array) $viewmodel as $item):?>
+            <?php $no = 1; ?>
+            <?php foreach ((array) $viewmodel as $item) : ?>
                 <tr>
-                    <td class="text-center"> <?php echo $no++;?> </td>
-                    <td class="text-right"> <?php echo $op->getempinfoById($item['emp_id'] , "emp_name") ;?> </td>
-                    <td class="text-center"> <?php echo $item['emp_deductiont_date'] ;?> </td>
-                    <td class="text-center"> <?php echo $op->getSeltdeductiontypetxt($item['deductiontype_id']) ;?> </td>
-                    <td class="text-center"> <?php echo $item['action_month'] ;?> </td>
-                    <td class="text-center"> $<?php echo $item['emp_deductiont_amount'] ;?> </td>
+                    <td class="text-center"> <?php echo $no++; ?> </td>
+                    <td class="text-right"> <?php echo $op->getempinfoById($item['emp_id'], "emp_name"); ?> </td>
+                    <td class="text-center"> <?php echo $item['emp_deductiont_date']; ?> </td>
+                    <td class="text-center"> <?php echo $op->getSeltdeductiontypetxt($item['deductiontype_id']); ?> </td>
+                    <td class="text-center"> <?php echo $item['action_month']; ?> </td>
+                    <td class="text-center"> $<?php echo $item['emp_deductiont_amount']; ?> </td>
                 </tr>
-            <?php endforeach;?>
-            <tfoot>
-                <tr>
-                    <td class="border text-center" colspan="5"> المجموع </td>
-                    <td class="border text-center" > $<?php echo $op->getSumempdeductionprint($_GET['DFrm'] , $_GET['Dto']);?> </td>
-                </tr>
-            </tfoot>
+            <?php endforeach; ?>
+        <tfoot>
+            <tr>
+                <td class="border text-center" colspan="5"> المجموع </td>
+                <td class="border text-center"> $<?php echo $op->getSumempdeductionprint($_GET['DFrm'], $_GET['Dto']); ?> </td>
+            </tr>
+        </tfoot>
         </tbody>
     </table>
 </div>
-
+<?php $op->get_report_footer(); ?>
 <script>
     window.print();
     window.addEventListener('cnacelprint', (event) => {

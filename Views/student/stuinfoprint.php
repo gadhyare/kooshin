@@ -1,27 +1,16 @@
+<?php
+
+/**
+ * fileName: طباعة معلومات الطالب  
+ */
+?>
 <br>
 <br>
 <div class="container print-page">
     <?php $op = new Khas(); ?>
-    <div class="header-section">
-        <div class="logo-section">
-            <img src="<?php echo $op->siteSetting('siteUrl'); ?>/uplouds/<?php echo $op->siteSetting('siteLogo'); ?>" style="height:80px; width:80px;" class="rounded-circle" alt="">
-        </div>
-            <div class="info-section">
-                <?php echo $op->siteSetting('siteName'); ?>
-                <br>
-                <?php echo $op->siteSetting('siteDisc'); ?>
-                <br>
-                <?php echo $op->siteSetting('siteAddr'); ?>
-                <br>
-                <?php echo $op->siteSetting('sitePhones'); ?>
-                <br>
-                تاريخ الطباعة: <?php echo date("Y-M-d", time()); ?>
-            </div>
-    </div>
-    
-    <div class="clearfix"></div>
-    <hr>
-    <h1 class="text-center">معلومات الطالب</h1>
+    <?php echo $op->get_report_header("معلومات الطالب"); ?>
+
+
     <?php
     $data  = json_decode($viewmodel); ?>
     <table class="print-table mt-2">
@@ -58,88 +47,88 @@
     <br>
 
     <table class="print-table mt-2">
-             
-          <tr>
-              <td colspan="8" class="text-center"> معلومات قريب الطالب</td>
-          </tr>
-            <tr>
-              <td class="p-1 bg-dark text-white" > المسلسل</td>
-              <td class="p-1 bg-dark text-white" > اسم القريب </td>
-              <td class="p-1 bg-dark text-white" > صلة القرابة </td>
-              <td class="p-1 bg-dark text-white" > درجة القرابة</td>
-              <td class="p-1 bg-dark text-white" > العنوان </td>
-              <td class="p-1 bg-dark text-white" > الإيميل </td>
-              <td class="p-1 bg-dark text-white" > العنوان </td>
-              <th class="p-1 bg-dark text-white"  >الهواتف</th>
-            </tr>
-          <tbody>
-                <?php $i = 1;?>
-                <?php $rt = $op->getStuRelInfo();?>
-                <?php foreach ((array) $rt as $relInfo) : ?>
-                    <tr>
-                    <td  class="p-1"  ><?php echo $i;?></td>
-                    <td  class="p-1"  style="font-size:90%;"><?php echo $relInfo['rel_name'];  ?></td>
-                    <td  class="p-1"  >
-                        <?php echo   $op->get_Rel_type($relInfo['rel_type']);?> </td>
-                    <td  class="p-1"  ><?php echo $op->getrel_lev($relInfo['rel_lev']);;?> </td>
-                    <td  class="p-1"  ><?php echo $relInfo['rel_Address'];;?> </td>
-                    <td  class="p-1"  ><?php echo $relInfo['rel_email'];;?> </td>
-                    <td  class="p-1"  ><?php echo $relInfo['rel_Address'];;?> </td>
-                    <td  class="p-1"  ><?php echo $relInfo['rel_phones'];;?> </td>
-                  </tr>
-                  <?php 
-                  $i++;
-                endforeach ; ?>
-         </tbody>
-        </table>
-  <!--=====================================================================================================-->
-    <br>
-    <br>
-    <table class="print-table mt-2">
-    <tr>
-              <td colspan="5" class="text-center">  المؤهلات العلمية للطالب  </td>
-          </tr>
-            <tr>
-              <td class="p-1 bg-dark text-white" > المسلسل</td>
-              <td class="p-1 bg-dark text-white" > درجة المؤهل  </td>
-              <td class="p-1 bg-dark text-white" > تاريخ المؤهل </td>
-              <td class="p-1 bg-dark text-white" > جهة المؤهل </td>
-              <td class="p-1 bg-dark text-white" > لغة المؤهل </td>
-            </tr>
-          <tbody>
-                <?php $i = 1;?>
-                <?php $rt = $op->getStuRelIquali();?>
-                <?php foreach ((array) $rt as $edu_eql_ifo) : ?>
-                    <tr>
-                    <td  class="p-1"  ><?php echo $i;?></td>
-                    <td  class="p-1"  style="font-size:90%;"><?php echo $edu_eql_ifo['Edu_quali'];  ?></td>
-                    <td  class="p-1"  > <?php echo $edu_eql_ifo['Edu_year'];?> </td>
-                    <td  class="p-1"  ><?php echo $edu_eql_ifo['Edu_Issuer'];?> </td>
-                    <td  class="p-1"  ><?php echo $edu_eql_ifo['Edu_lang'];?> </td>
 
-                  </tr>
-                  <?php 
-                  $i++;
-                endforeach ; ?>
-         </tbody>
-        </table>
-   <!--=====================================================================================================-->
+        <tr>
+            <td colspan="8" class="text-center"> معلومات قريب الطالب</td>
+        </tr>
+        <tr>
+            <td class="p-1 " style="color: #000;"> المسلسل</td>
+            <td class="p-1 " style="color: #000;"> اسم القريب </td>
+            <td class="p-1 " style="color: #000;"> صلة القرابة </td>
+            <td class="p-1 " style="color: #000;"> درجة القرابة</td>
+            <td class="p-1 " style="color: #000;"> العنوان </td>
+            <td class="p-1 " style="color: #000;"> الإيميل </td>
+            <td class="p-1 " style="color: #000;"> العنوان </td>
+            <td class="p-1 " style="color: #000;">الهواتف</td>
+        </tr>
+        <tbody>
+            <?php $i = 1; ?>
+            <?php $rt = $op->getStuRelInfo(); ?>
+            <?php foreach ((array) $rt as $relInfo) : ?>
+                <tr>
+                    <td class="p-1"><?php echo $i; ?></td>
+                    <td class="p-1" style="font-size:90%;"><?php echo $relInfo['rel_name'];  ?></td>
+                    <td class="p-1">
+                        <?php echo   $op->get_Rel_type($relInfo['rel_type']); ?> </td>
+                    <td class="p-1"><?php echo $op->getrel_lev($relInfo['rel_lev']); ?> </td>
+                    <td class="p-1"><?php echo $relInfo['rel_Address']; ?> </td>
+                    <td class="p-1"><?php echo $relInfo['rel_email']; ?> </td>
+                    <td class="p-1"><?php echo $relInfo['rel_Address']; ?> </td>
+                    <td class="p-1"><?php echo $relInfo['rel_phones'];; ?> </td>
+                </tr>
+            <?php
+                $i++;
+            endforeach; ?>
+        </tbody>
+    </table>
+    <!--=====================================================================================================-->
     <br>
-    <br>  
+    <br>
     <table class="print-table mt-2">
-            <tr >
-                <td colspan="7" class="text-center"> المعلومات الأكاديمية </td>
-            </tr>
-            <tr>
-                <td class="p-1  bg-dark text-white"> المسلسل</td>
-                <td class="p-1  bg-dark text-white"> البرنامج </td>
-                <td class="p-1  bg-dark text-white"> المستوى </td>
-                <td class="p-1  bg-dark text-white"> المجموعة </td>
-                <td class="p-1  bg-dark text-white"> تاريخ التسجيل </td>
-                <td class="p-1  bg-dark text-white"> خصم خاص </td>
-                <td class="p-1  bg-dark text-white"> الحالة </td>
-            </tr>
-      
+        <tr>
+            <td colspan="5" class="text-center"> المؤهلات العلمية للطالب </td>
+        </tr>
+        <tr>
+            <td class="p-1 " style="color: #000;"> المسلسل</td>
+            <td class="p-1 " style="color: #000;"> درجة المؤهل </td>
+            <td class="p-1 " style="color: #000;"> تاريخ المؤهل </td>
+            <td class="p-1 " style="color: #000;"> جهة المؤهل </td>
+            <td class="p-1 " style="color: #000;"> لغة المؤهل </td>
+        </tr>
+        <tbody>
+            <?php $i = 1; ?>
+            <?php $rt = $op->getStuRelIquali(); ?>
+            <?php foreach ((array) $rt as $edu_eql_ifo) : ?>
+                <tr>
+                    <td class="p-1"><?php echo $i; ?></td>
+                    <td class="p-1" style="font-size:90%;color:#000"><?php echo $edu_eql_ifo['Edu_quali'];  ?></td>
+                    <td class="p-1"> <?php echo $edu_eql_ifo['Edu_year']; ?> </td>
+                    <td class="p-1"><?php echo $edu_eql_ifo['Edu_Issuer']; ?> </td>
+                    <td class="p-1"><?php echo $edu_eql_ifo['Edu_lang']; ?> </td>
+
+                </tr>
+            <?php
+                $i++;
+            endforeach; ?>
+        </tbody>
+    </table>
+    <!--=====================================================================================================-->
+    <br>
+    <br>
+    <table class="print-table mt-2">
+        <tr>
+            <td colspan="7" class="text-center"> المعلومات الأكاديمية </td>
+        </tr>
+        <tr>
+            <td class="p-1" style="color: #000;"> المسلسل</td>
+            <td class="p-1" style="color: #000;"> البرنامج </td>
+            <td class="p-1" style="color: #000;"> المستوى </td>
+            <td class="p-1" style="color: #000;"> المجموعة </td>
+            <td class="p-1" style="color: #000;"> تاريخ التسجيل </td>
+            <td class="p-1" style="color: #000;"> خصم خاص </td>
+            <td class="p-1" style="color: #000;"> الحالة </td>
+        </tr>
+
         <tbody>
             <?php $i = 1; ?>
             <?php $rt = $op->getStudentacademicPro(); ?>
@@ -176,7 +165,7 @@
 
 </div>
 
-
+<?php $op->get_report_footer();?>
 <script>
     window.print();
     window.addEventListener('afterprint', (event) => {

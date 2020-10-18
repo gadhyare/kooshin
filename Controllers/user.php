@@ -38,4 +38,16 @@
         $viewmodel = new userModel();
         $this->returnView($viewmodel->usrRole(), true);
     }
+
+    protected function userrols(){
+        $viewmodel = new userModel();
+        $this->returnView($viewmodel->userrols(), true);
+    }
+
+    protected function usrsectanddep(){
+        $viewmodel = new userModel();
+        $this->returnView($viewmodel->usrsectanddep(), true);
+    }
+    
+    
 }

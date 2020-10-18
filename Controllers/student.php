@@ -83,13 +83,11 @@
         $viewmodel = new StudentModel();
         $this->returnView($viewmodel->uploadfile(), true);
     }
-    public function doupload()
+    public function exporttoexcel()
     {
         $viewmodel = new StudentModel();
-        $this->returnView($viewmodel->doupload(), true);
+        $this->returnView($viewmodel->exporttoexcel(), true);
     }
-
-
 
     public function addsturel()
     {

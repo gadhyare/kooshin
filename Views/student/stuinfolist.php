@@ -1,3 +1,10 @@
+<?php
+
+/**
+ * fileName:     تقرير اختبار مادة 
+ */
+?>
+<?php $op = new Khas(); ?>
 <div class="container">
     <form action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
         <div class="container mt-5">
@@ -8,11 +15,11 @@
                         <div class="col-12 text-center">
                             <div class="form-group  ">
                                 <select class="form-control p-1 col-xs-12 col-6 rounded-0 float-right" id="prog_id" name="prog_id" style="font-size:85%">
-                                    <?php $op->FullSelProgInfo($prog_id); ?>
+                                    <?php $op->FullSelProgInfo($_GET['prog']); ?>
                                 </select>
                                 <button type="submit" name="showData" id="showData" class="btn danger-color-dark text-white mt-0 px-3 py-2"> <i class="fa fa-info"></i> اظهار المعلومات </button>
                                 <?php if (isset($_GET['prog']) && isset($_GET['grp']) && isset($_GET['dep']) && isset($_GET['sec']) && isset($_GET['lev'])) :
-                                    echo '<a  href="'.ROOT_URL.'/student/stuinfolistprint/?prog=' . $_GET['prog'] . '&dep=' . $_GET['dep'] . '&sec=' . $_GET['sec'] . '&lev=' . $_GET['lev'] . '&grp=' . $_GET['grp'] . '" target="_blank"  class="btn unique-color-dark text-white mt-0 px-3 py-2">  <i class="fa fa-print"></i> طباعة المعلومات </a>';
+                                    echo '<a  href="' . ROOT_URL . '/student/stuinfolistprint/?prog=' . $_GET['prog'] . '&dep=' . $_GET['dep'] . '&sec=' . $_GET['sec'] . '&lev=' . $_GET['lev'] . '&grp=' . $_GET['grp'] . '" target="_blank"  class="btn unique-color-dark text-white mt-0 px-3 py-2">  <i class="fa fa-print"></i> طباعة المعلومات </a>';
                                 endif; ?>
                             </div>
                         </div>
@@ -51,6 +58,7 @@
                     </div>
     </form>
 
+    <?php if(isset($_GET['prog'])) $op->chkSelProgtxt($_GET['prog']); ?>
     <hr>
     <div id="idCount"></div>
     <div class="container  ">
@@ -72,13 +80,13 @@
                         <tr>
                             <td class="p-0 text-center"> <i id="no"> <?php echo $no++; ?></i> </td>
                             <td class="p-0 text-center"> <?php echo $op->getStuNameById($val->stu_id); ?></td>
-                            <td class="p-0 text-center"> <?php echo $op->getStuInfoById($val->stu_id, 'stu_num' ); ?></td>
+                            <td class="p-0 text-center"> <?php echo $op->getStuInfoById($val->stu_id, 'stu_num'); ?></td>
                             <td class="p-0 text-center"> <?php echo $val->reg_date; ?></td>
-                            <td class="p-0 text-center"> <?php echo $op->getStuInfoById($val->stu_id, 'Phones' ); ?></td>
+                            <td class="p-0 text-center"> <?php echo $op->getStuInfoById($val->stu_id, 'Phones'); ?></td>
                             <td class="p-0 text-center"> <?php echo $val->statues; ?></td>
                             <td class="p-0 text-center">
                                 <a href="<?php echo ROOT_URL; ?>/student/update/<?php echo $val->stu_id; ?>" class="btn bg-success text-white border-0 rounded-0 p-1"><i class="fa fa-pencil p-0" aria-hidden="true"></i> </a>
-                                <a href="<?php echo ROOT_URL; ?>/student/update/<?php echo $val->stu_id; ?>" class="btn bg-danger text-white border-0 rounded-0 p-1"><i class="fa fa-trash-o" aria-hidden="true"></i> </a>
+                                <a href="<?php echo ROOT_URL; ?>/student/update/<?php echo $val->stu_id; ?>" class="btn danger-color-dark text-white border-0 rounded-0 p-1"><i class="fa fa-trash-o" aria-hidden="true"></i> </a>
                             </td>
                         </tr>
                     <?php endforeach; ?>

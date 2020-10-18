@@ -93,4 +93,45 @@
         }
 
     }
+
+
+    public function setprogreport()
+    {
+        $op = new Khas();
+        if (isset($_POST['seledulev_id'])) {
+            header("refresh:0;url=" . ROOT_URL . "/programs/setprogreport?edulev_id=" . $_POST['edulev_id']);
+        }
+        if (isset($_POST['prog_id'])) {
+            header("refresh:0;url=" . ROOT_URL . "/programs/setprogreport?edulev_id=" . $_GET['edulev_id'] . "&prog_id=" . $_POST['prog_id']);
+        }
+
+        if (isset($_GET['selprog_id'])) {
+            $data = explode(",",$_GET['selprog_id']);
+            foreach( $data as $item){
+                if($op->get_report_type($item)) continue;
+                    $this->query('INSERT INTO  exam_reports (  prog_id ,  report ) VALUES (:prog_id ,  :report)');
+                    $this->bind(":prog_id", $item);
+                    $this->bind(":report", "custom");
+                    $this->execute();                    
+                 
+            }
+            if($this->lastInsertId()){
+                $_SESSION['msg'] = SUCCESS;
+            }
+        }
+
+        
+
+        if (isset($_GET['prog_id'])) {
+            $this->query('SELECT * FROM programs WHERE prog_id=:prog_id');
+            $this->bind(":prog_id", $_GET['prog_id']);
+            $rows = $this->resultSet();
+            return  json_encode($rows);
+        }
+    }
+
+
+ 
+
+    
 }

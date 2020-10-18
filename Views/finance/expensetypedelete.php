@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: حذف أنواع الصرفيات
+ */
+?>
 <form action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
     <?php foreach ((array) $viewmodel as $delete_items) : ?>
         <div class="container p-2 mt-2 alert alert-danger  text-center font-weight-bold col-xs-12 col-sm-10 col-md-6">

@@ -1,5 +1,11 @@
-<?php
+    <?php
+    /**
+     * fileName:  تعديل اختبار طالب
+     */
+    ?>
 
+
+<?php
 $items = json_decode($viewmodel);
 
 if (count((array) $items)) : ?>
@@ -136,11 +142,11 @@ if (count((array) $items)) : ?>
         var addExamForStu = document.getElementById("btnUpdate");
         total.value = parseInt(qu1.value) + parseInt(as1.value) + parseInt(ex1.value) + parseInt(qu2.value) + parseInt(as2.value) + parseInt(ex2.value) + parseInt(att.value);
         if( total.value > 100 ){
-            total.classList.add("bg-danger");
+            total.classList.add("danger-color-dark");
             total.classList.add("text-white");
             addExamForStu.disabled = true;
         }else{
-            total.classList.remove("bg-danger");
+            total.classList.remove("danger-color-dark");
             total.classList.remove("text-white");
             addExamForStu.disabled = false;
 

@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName:    تعديل الرسوم المرفوعة
+ */
+?>
 <?php foreach ((array) $viewmodel as $item) : ?>
     <div class="container col-xs-12 col-md-6 m-auto">
         <div class="card p-0 rounded-0 border-0 z-depth-1">
@@ -9,10 +15,10 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-12">
-                            الاسم : 
+                            الاسم :
                             <?php echo $op->getStuNameById($item['stu_id']); ?>
                             <hr class="p-1 mt-0 mb-0">
-                        </div>                        
+                        </div>
                         <div class="col-12">
                             البرنامج
                             <hr class="p-1 mt-0 mb-0">
@@ -64,13 +70,13 @@
                             <div class="col-xs-12 col-md-6">
                                 المبلغ
                                 <hr class="p-1 mt-0 mb-0">
-                                <input type="number" name="amount" id="amout" value="<?php echo $item['want'];?>"  class="form-control rounded-0" min="0">
+                                <input type="number" name="amount" id="amout" value="<?php echo $item['want']; ?>" class="form-control rounded-0" min="0">
                             </div>
                         </div>
                     </div>
                     <hr>
-                    <button type="submit" name="updateStuFee"  class="btn success-color-dark text-white px-3 py-2" >  رفع الرسوم  </button>
-                    <a href="<?php echo ROOT_URL;?>/finance/feeclasstrando"  class="btn danger-color-dark text-white float-left px-3 py-2"> إلغاء </a>
+                    <button type="submit" name="updateStuFee" class="btn success-color-dark text-white px-3 py-2"> رفع الرسوم </button>
+                    <a href="<?php echo ROOT_URL; ?>/finance/feeclasstrando" class="btn danger-color-dark text-white float-left px-3 py-2"> إلغاء </a>
                 </div>
             </form>
         </div>

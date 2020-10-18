@@ -1,25 +1,14 @@
+<?php
+
+/**
+ * fileName: طباعة سند قبض مرتب    
+ */
+?>
 <br>
 <br>
 <div class="container print-page">
     <?php $op = new Khas(); ?>
-    <div class="header-section">
-        <div class="logo-section">
-            <img src="<?php echo $op->siteSetting('siteUrl'); ?>/uplouds/<?php echo $op->siteSetting('siteLogo'); ?>" style="height:150px; width:150px;" class="rounded-circle p-0" alt="">
-        </div>
-        <div class="info-section">
-            <?php echo $op->siteSetting('siteName'); ?>
-            <br>
-            <?php echo $op->siteSetting('siteDisc'); ?>
-            <br>
-            <?php echo $op->siteSetting('siteAddr'); ?>
-            <br>
-            <?php echo $op->siteSetting('sitePhones'); ?>
-            <br>
-            تاريخ الطباعة: <?php echo date("Y-M-d", time()); ?>
-        </div>
-    </div>
-    <hr class="hr">
-    <h1 class="text-center"> سند قبض مرتب موظف </h1>
+    <?php $op->get_report_header("سند قبض مرتب موظف"); ?>
     <table class="print-table">
         <tbody>
             <?php if ($viewmodel) : ?>
@@ -124,6 +113,9 @@
 
 </div>
 </div>
+
+
+<?php $op->get_report_footer(); ?>
 <script>
     window.print();
     window.addEventListener('afterprint', (event) => {

@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: تقرير مرتبات الموظفين 
+ */
+?>
 <?php $op = new Khas(); ?>
 <?php if ($viewmodel) : ?>
 
@@ -20,7 +26,7 @@
                     <td class="p-1 text-center">
                         <?php echo $is++; ?>
                         <input type="hidden" name="getId" id="getId" value="<?php echo $item['empSellary_id']; ?>">
-                        <input type="hidden" name="action_month" id="action_month" value="<?php echo $item['action_month'] ;?>" >
+                        <input type="hidden" name="action_month" id="action_month" value="<?php echo $item['action_month']; ?>">
                     </td>
                     <td class="p-1 text-right" style="font-size:80%;direction:rtl !important">
                         <?php echo $op->getempinfoById($item['emp_id'], "emp_name") . " | " . $item['emp_id']; ?> </td>
@@ -28,12 +34,12 @@
                     <td class="p-1 text-center">$<?php echo $item['emp_deductiont']; ?></td>
                     <td class="p-1 text-center">$<?php echo $item['emp_debt']; ?></td>
                     <td class="p-1 text-center">$<?php echo $item['empSellary']; ?></td>
-                    <td class="p-1 text-center" >
-                        $<?php echo ($item['empSellary'] + $item['emp_allowance']) - ($item['emp_deductiont'] + $item['emp_debt']); ?>
-                        <?php $netSellary= ($item['empSellary'] + $item['emp_allowance']) - ($item['emp_deductiont'] + $item['emp_debt']); ?> 
-                </td>
                     <td class="p-1 text-center">
-                        <a href="<?php echo ROOT_URL; ?>/finance/empsellarypaid/<?php echo $item['emp_id'];?>?empSellary_id=<?php echo $item['empSellary_id'];?>&sellery=<?php echo $netSellary;?>&action_month=<?php echo $item['action_month'] ;?>" target="_blank" class="btn py-1 px-2 success-color-dark text-white"  > <i class="fa fa-dollar"></i> </a>
+                        $<?php echo ($item['empSellary'] + $item['emp_allowance']) - ($item['emp_deductiont'] + $item['emp_debt']); ?>
+                        <?php $netSellary = ($item['empSellary'] + $item['emp_allowance']) - ($item['emp_deductiont'] + $item['emp_debt']); ?>
+                    </td>
+                    <td class="p-1 text-center">
+                        <a href="<?php echo ROOT_URL; ?>/finance/empsellarypaid/<?php echo $item['emp_id']; ?>?empSellary_id=<?php echo $item['empSellary_id']; ?>&sellery=<?php echo $netSellary; ?>&action_month=<?php echo $item['action_month']; ?>" target="_blank" class="btn py-1 px-2 success-color-dark text-white"> <i class="fa fa-dollar"></i> </a>
                     </td>
                 </tr>
             <?php endforeach; ?>

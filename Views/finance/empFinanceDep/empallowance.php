@@ -72,7 +72,7 @@
 
                 <?php endif; ?>
             </form>
-            <div id="uio" class="p-2 bg-danger text-white text-center"></div>
+            <div id="uio" class="p-2 danger-color-dark text-white text-center"></div>
         </div>
         <div class="col-xs-12 col-md-8  ">
             <div class="card p-0 rounded-0">

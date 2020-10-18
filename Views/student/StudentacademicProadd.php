@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: اضافة البرامج العلمية للطالب
+ */
+?>
 <div class="container mt-5 col-xs-12 col-sm-10 col-md-6">
     <div class="card  ">
         <div class="card-header  blue-grey darken-4 text-white font-weight-bold text-center p-1"> اضافة برنامج دراسي للطالب </div>
@@ -5,7 +11,7 @@
             <form action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
                 <div class="row">
                     <?php $op = new Khas(); ?>
-                    
+
                     <div class="col-xs-12 col-sm-12 col-md-6">
                         <div class="form-group">
                             <label> تاريخ التسجيل </label>
@@ -48,7 +54,7 @@
                         <div class="form-group">
                             <label> القسم </label>
                             <select name="sec_id" id="sec_id" class="form-control p-1  rounded-0">
-                                <?php echo $op->get_section() ; ?>
+                                <?php echo $op->get_section(); ?>
                             </select>
                         </div>
                     </div>
@@ -70,8 +76,8 @@
                         </div>
                     </div>
                 </div>
-                <input type="submit" name="add_stu_prog" value="اضافة" class="btn btn-primary text-light px-3 py-2">
-                <a href="<?php echo ROOT_URL; ?>/subject" class="btn btn-danger text-light p-2">إلغاء</a>
+                <input type="submit" name="add_stu_prog" value="اضافة" class="btn primary-color-dark text-white px-3 py-2">
+                <a href="<?php echo ROOT_URL; ?>/subject" class="btn danger-color-dark text-white p-2">إلغاء</a>
             </form>
         </div>
     </div>

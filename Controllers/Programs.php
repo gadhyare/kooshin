@@ -29,5 +29,11 @@
         $viewmodel = new programsModel();
         $this->returnView($viewmodel->prosub(), true);
     }
-     
+
+
+    
+    protected function setprogreport(){
+        $viewmodel = new programsModel();
+        $this->returnView($viewmodel->setprogreport(), true);
+    }     
 }

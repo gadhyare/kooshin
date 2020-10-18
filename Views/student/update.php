@@ -1,4 +1,9 @@
-<?php include('getdepartment.php'); ?>
+<?php
+
+/**
+ * fileName: تعديل معلومات  طالب
+ */
+?>
 <?php if (isset($_SESSION['msg'])) {
   echo $_SESSION['msg'];
 } ?>
@@ -9,7 +14,7 @@
       <div class="container text-left">
         <input type="submit" name="Update_Stu_Info" value="تعديل بيانات طالب" class="btn danger-color-dark   rounded-0 text-white    mb-3  py-1 px-3" name="add_student">
         <a href="<?php echo ROOT_URL; ?>/student/info" class="btn stylish-color-dark rounded-0 text-white mb-3 py-1 px-3"> الرجوع لبيانات الطلاب </a>
-        <a href="<?php echo ROOT_URL; ?>/student/stuInfoPrint/<?php echo $_GET['id'];?>"  target="_blank" class="btn primary-color-dark rounded-0 text-white mb-3 py-1 px-3">   <i class="fa fa-print"></i>   </a>
+        <a href="<?php echo ROOT_URL; ?>/student/stuInfoPrint/<?php echo $_GET['id']; ?>" target="_blank" class="btn primary-color-dark rounded-0 text-white mb-3 py-1 px-3"> <i class="fa fa-print"></i> </a>
         <button type="button" class="btn rgba-black-strong text-white float-right  py-1 px-3" data-toggle="modal" data-target="#exampleModalCenter">
           <i class="fa  fa-folder-open"></i> اختيار الصورة
         </button>
@@ -141,14 +146,14 @@
             <?php show_images(); ?>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-danger rounded-0 ml-1" data-dismiss="modal"> اغلاق </button>
+            <button type="button" class="btn danger-color-dark rounded-0 ml-1" data-dismiss="modal"> اغلاق </button>
 
           </div>
         </div>
       </div>
     </div>
 
- 
+
 
 
 
@@ -163,7 +168,7 @@
     </div>
     <div id="collapseThree" class="collapse" role="tabpanel" aria-labelledby="headingThree">
       <div class="card-block p-1">
-        <?php require("Studentrelinfo.php"); ?>
+        <?php require("subfolderforstudentsinfo/Studentrelinfo.php"); ?>
       </div>
     </div>
   </div>
@@ -177,7 +182,7 @@
     </div>
     <div id="collapseTwo" class="collapse" role="tabpanel" aria-labelledby="headingTwo">
       <div class="card-block p-1">
-        <?php require("Studentacademicinfo.php"); ?>
+        <?php require("subfolderforstudentsinfo/Studentacademicinfo.php"); ?>
       </div>
     </div>
   </div>
@@ -192,7 +197,7 @@
     <div id="collapsestudeis" class="collapse" role="tabpanel" aria-labelledby="headingFour">
       <div class="card-block p-1">
         <table class="table table-bordered">
-          <?php require("StudentacademicPro.php"); ?>
+          <?php require("subfolderforstudentsinfo/StudentacademicPro.php"); ?>
         </table>
       </div>
     </div>

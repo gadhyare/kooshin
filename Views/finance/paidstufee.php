@@ -1,3 +1,9 @@
+<?php
+
+/**
+ * fileName: معلومات الرسوم
+ */
+?>
 <div class="container">
     <?php foreach ((array) $viewmodel as $item) : ?>
         <?php $op = new Khas(); ?>
@@ -12,10 +18,10 @@
                     <div class="card-body">
                         <table class="table table-striped">
                             <tr>
-                                <td class="p-2" style="font-size: 80%"> ر. الجامع <?php echo $item['stu_id'] ;?></td>
-                                <td class="p-2" style="font-size: 80%"> <?php echo $op->getStuInfoById($item['stu_id'],'stu_id'); ?> </td>
+                                <td class="p-2" style="font-size: 80%"> ر. الجامع <?php echo $item['stu_id']; ?></td>
+                                <td class="p-2" style="font-size: 80%"> <?php echo $op->getStuInfoById($item['stu_id'], 'stu_id'); ?> </td>
                                 <td class="p-2" style="font-size: 80%"> اسم الطالب </td>
-                                <td class="p-2" style="font-size: 80%" colspan="3"> <?php echo $op->getStuInfoById($item['stu_id'] , "StuName" ); ?> </td>
+                                <td class="p-2" style="font-size: 80%" colspan="3"> <?php echo $op->getStuInfoById($item['stu_id'], "StuName"); ?> </td>
                             </tr>
                             <tr>
                                 <td class="p-2" style="font-size: 80%"> البرنامج</td>
@@ -54,8 +60,8 @@
                             <div class="row">
                                 <div class="col-12">
                                     <label for="acc_mov"> رقم الحساب </label>
-                                    <select name="acc_mov" id="acc_mov"  class="form-control rounded-0 p-0">
-                                        <?php $op->getBankDataList();?>
+                                    <select name="acc_mov" id="acc_mov" class="form-control rounded-0 p-0">
+                                        <?php $op->getBankDataList(); ?>
                                     </select>
                                 </div>
                                 <div class="col-xs-12 col-md-6">
@@ -85,7 +91,7 @@
                             </div>
                             <button type="submit" name="paidFee" class="btn success-color-dark text-white px-3 py-2"> رفع الرسوم </button>
                             <a href="<?php echo ROOT_URL; ?>/finance/feepaid" class="btn danger-color-dark text-white float-left px-3 py-2"> إلغاء </a>
-                            <a href="<?php echo ROOT_URL; ?>/finance/paidstufeeprint/<?php echo  $item['Invoice_id'];?>" target="_blank"   class="btn danger-color-dark text-white float-left px-3 py-2"> <i class="fa fa-print"></i> </a>
+                            <a href="<?php echo ROOT_URL; ?>/finance/paidstufeeprint/<?php echo  $item['Invoice_id']; ?>" target="_blank" class="btn danger-color-dark text-white float-left px-3 py-2"> <i class="fa fa-print"></i> </a>
 
                         </div>
                     </div>
@@ -129,7 +135,7 @@
                         <td class="p-1" style="width:40%"> <?php echo $item['note']; ?> </td>
                         <td class="p-1 text-center" style="width:10%;font-size: 70%;">
                             <span> <a href="<?php echo ROOT_URL; ?>/finance/updatepaidstufee/<?php echo $item['sta_id']; ?>/?sta_id=<?php echo $_GET['id']; ?>" class="bg-info text-white rounded-0  px-1 py-0 m-1 " data-toggle="tooltip" title="تعديل الرسوم"> <i class="fa fa-pencil p-0" aria-hidden="true"></i> </a> </span>
-                            <span> <a href="<?php echo ROOT_URL; ?>/finance/delpaidstufee/<?php echo $item['sta_id']; ?>/?sta_id=<?php echo $_GET['id'] ; ?>" class="danger-color-dark ml-1  text-white rounded-0 px-1 py-0 " data-toggle="tooltip" title="حذف الرسوم"> <i class="fa fa-trash  p-0" aria-hidden="true"></i> </a> </span>
+                            <span> <a href="<?php echo ROOT_URL; ?>/finance/delpaidstufee/<?php echo $item['sta_id']; ?>/?sta_id=<?php echo $_GET['id']; ?>" class="danger-color-dark ml-1  text-white rounded-0 px-1 py-0 " data-toggle="tooltip" title="حذف الرسوم"> <i class="fa fa-trash  p-0" aria-hidden="true"></i> </a> </span>
                         </td>
                     </tr>
                 <?php endforeach; ?>

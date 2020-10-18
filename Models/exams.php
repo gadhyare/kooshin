@@ -1,4 +1,12 @@
-<?php class ExamsModel extends Model
+<?php
+require getcwd() . '/lib/phpspreadsheet/vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Helper\Sample;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+class ExamsModel extends Model
 {
     public  $rowss;
     public function index()
@@ -7,6 +15,9 @@
 
     public function add()
     {
+        if (isset($_POST['seclect_data'])) {
+            header("refresh:0;url=" . ROOT_URL . "/exams/add?stu_id=" . $_POST['stu_id']);
+        }
     }
 
     public function newexam()
@@ -44,21 +55,24 @@
 
     public function doupload($fileName)
     {
+        $op = new Khas();
         $file = getcwd() . "/filesdir/$fileName";
-        $file_open = fopen($file, "r");
-        while (($csv = fgetcsv($file_open, 10000, ",")) !== false) {
-            $iNum = count($csv);
-            $sResult = $csv;
-            $sCSVData = implode(";", $sResult);
-            $aCSVData = explode(";", $sCSVData);
-            $stu_id = $aCSVData[0];
-            $qu1 = $aCSVData[1];
-            $as1 = $aCSVData[2];
-            $ex1 = $aCSVData[3];
-            $qu2 = $aCSVData[4];
-            $as2 = $aCSVData[5];
-            $ex2 = $aCSVData[6];
-            $att = $aCSVData[7];
+        $inputType = "Xlsx";
+        $reader = IOFactory::createReader($inputType);
+        $reader->setReadDataOnly(true);
+        $spreadsheet = $reader->load($file);
+        $sheetData = $spreadsheet->getActiveSheet()->toArray(); 
+        $x = 1;
+        foreach ($sheetData as $col) {
+            if ($x != 1) :
+            $stu_id =  $op->getStuInfoByStunm($col[2] , "stu_id") ;
+            $qu1 = $col[3];
+            $as1 = $col[4];
+            $ex1 = $col[5];
+            $qu2 = $col[6];
+            $as2 = $col[7];
+            $ex2 = $col[8];
+            $att = $col[9];
             $this->query("INSERT INTO exams(stu_id,prog_id,  dep_id,    sec_id, lev_id, grp_id, sub_id, ex_code, ex_crid, qu1, as1, ex1, qu2, as2, ex2, att, ex_date) VALUES 
             (:stu_id,:prog_id, :dep_id, :sec_id,:lev_id,:grp_id,:sub_id,:ex_code,:ex_crid,:qu1,:as1,:ex1,:qu2,:as2,:ex2,:att,:ex_date)");
             $this->bind(':stu_id', $stu_id);
@@ -68,7 +82,7 @@
             $this->bind(':lev_id', $_POST['lev_id']);
             $this->bind(':grp_id', $_POST['grp_id']);
             $this->bind(':sub_id', $_POST['sub_id']);
-            $this->bind(':ex_code', $_POST['ex_code']);
+            $this->bind(':ex_code', $op->get_subject_code($_POST['sub_id']) . $_POST['ex_code'] ?? $_POST['ex_code']);
             $this->bind(':ex_crid', $_POST['ex_crid']);
             $this->bind(':qu1', $qu1);
             $this->bind(':as1', $as1);
@@ -80,7 +94,11 @@
             $this->bind(':ex_date', date("Y-m-d"));
             $this->execute();
             $_SESSION['msg'] = SUCCESS;
+            endif;
+            $x++;
+           
         }
+        
     }
 
 
@@ -160,7 +178,7 @@
                 $this->bind(":lev_id", $_POST['lev_id']);
                 $this->bind(":grp_id", $_POST['grp_id']);
                 $this->bind(":sub_id", $_POST['sub_id']);
-                $this->bind(":ex_code", $_POST['ex_code']);
+                $this->bind(":ex_code", $op->get_subject_code($_POST['sub_id']) . $_POST['ex_code'] ?? $_POST['ex_code']);
                 $this->bind(":ex_crid", $_POST['ex_crid']);
                 $this->bind(":qu1", $_POST['qu1']);
                 $this->bind(":as1", $_POST['as1']);
@@ -232,6 +250,8 @@
     {
         $op = new Khas();
 
+        
+
         if (isset($_POST['addExamForStu'])) {
             if (empty($_POST['ex_code']) && empty($_POST['ex_crid']) && empty($_POST['stu_id'])) {
                 $_SESSION['msg'] = ERR_EMPTY;
@@ -249,7 +269,7 @@
                     $this->bind(':lev_id', $_POST['lev_id']);
                     $this->bind(':grp_id', $_POST['grp_id']);
                     $this->bind(':sub_id', $_POST['sub_id']);
-                    $this->bind(':ex_code', $_POST['ex_code']);
+                    $this->bind(':ex_code',     $_POST['ex_code']);
                     $this->bind(':ex_crid', $_POST['ex_crid']);
                     $this->bind(':qu1', $_POST['qu1']);
                     $this->bind(':as1', $_POST['as1']);
@@ -372,7 +392,7 @@
                     if ($row) {
                         $this->query("UPDATE exams SET ex_code=:ex_code   WHERE prog_id=:prog_id AND dep_id=:dep_id AND sec_id=:sec_id 
                                     AND lev_id=:lev_id AND grp_id=:grp_id AND sub_id=:sub_id");
-                        $this->bind(":ex_code", $_POST['ex_code']);
+                        $this->bind(":ex_code",  $op->get_subject_code($_POST['sub_id']) . $_POST['ex_code'] ?? $_POST['ex_code']);
                         $this->bind(":prog_id", $_GET['ids']);
                         $this->bind(":dep_id", $_GET['dep_id']);
                         $this->bind(":sec_id", $_GET['sec_id']);

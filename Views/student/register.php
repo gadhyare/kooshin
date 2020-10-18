@@ -1,19 +1,23 @@
-<?php include('getdepartment.php'); ?>
-<?php $op = new Khas(); ?>
+<?php
 
-<form action="<?php $_SERVER['PHP_SELF']; ?>" method="post">
+/**
+ * fileName:  تسجيل طالب
+ */
+?>
+<?php $op = new Khas(); ?>
+<form action="<?php $_SERVER['PHP_SELF']; ?>" method="post" enctype="multipart/form-data">
   <button type="button" class="btn rgba-black-strong text-white float-right  py-2 px-3" data-toggle="modal" data-target="#exampleModalCenter">
     <i class="fa  fa-folder-open"></i> اختيار الصورة
   </button>
   <div class="container text-left">
     <input type="submit" name="add_stu" value="التالي" id="submit" class="btn bg-danger   rounded-0 text-white    mb-3  py-2 px-3">
-    <a href="<?php echo ROOT_URL; ?>/student/info" class="btn bg-primary rounded-0 text-white mb-3 py-2 px-3"> الرجوع لبيانات الطلاب </a>
+    <a href="<?php echo ROOT_URL; ?>/student/info" class="btn primary-color-dark rounded-0 text-white mb-3 py-2 px-3"> الرجوع لبيانات الطلاب </a>
   </div>
-
   <br>
   <div class="form-group input-group-sm p-1 m-0 text-center">
-    <img src="" alt="" id="student_img" style="width:100px;height:100px;" class="border border-danger rounded-circle">
+    <img src="" alt="" id="student_img" onError="this.onerror=null;this.src='<?php echo ROOT_URL; ?>/assets/img/1.png';" style="width:100px;height:100px;" class="border   float-left">
   </div>
+  <div class="clearfix"></div>
   <div id="accordion" role="tablist" aria-multiselectable="true">
     <div class="card mb-1  rounded-0">
       <div class="card-header accord-header mdb-color darken-3 text-center    rounded-0" role="tab" id="headingOne">
@@ -23,8 +27,6 @@
           </a>
         </h5>
       </div>
-
-
       <div id="collapseOne" class="collapse show" role="tabpanel" aria-labelledby="headingOne">
         <div class="card-block p-1 ">
           <table class="table table-bordered">
@@ -46,10 +48,7 @@
                   <label> اسم الأم </label>
                   <input type="text" required="required" name="mothername" value="<?php echo $op->setPosts("mothername"); ?>" class="form-control input-sm p-1  rounded-0" placeholder="اسم الأم">
                 </div>
-
               </td>
-
-
               <td>
                 <div class="form-group input-group-sm p-1 m-0">
                   <label> الجنس </label>
@@ -58,26 +57,15 @@
                     <option value="2"> أنثى </option>
                   </select>
                 </div>
-
               </td>
-
             </tr>
-
             <tr>
-
               <td>
-
                 <div class="form-group input-group-sm p-1 m-0">
                   <label> تاريخ الميلاد </label>
-
                   <input type="date" required="required" name="DOB" value="<?php echo $op->setPosts("DOB"); ?>" class="form-control input-sm p-1  rounded-0" placeholder=" مكان الميلاد ">
-
-
                 </div>
-
               </td>
-
-
               <td>
                 <div class="form-group input-group-sm p-1 m-0">
                   <label> مكان الميلاد </label>
@@ -89,18 +77,14 @@
                   <label> الجنسية </label>
                   <input type="text" required="required" name="Natinality" value="<?php echo $op->setPosts("Natinality"); ?>" class="form-control input-sm p-1  rounded-0" placeholder=" الجنسية ">
                 </div>
-
               </td>
-
               <td>
                 <div class="form-group input-group-sm p-1 m-0">
                   <label> عنوان السكن </label>
                   <input type="text" required="required" name="StuAddress" value="<?php echo $op->setPosts("StuAddress"); ?>" class="form-control input-sm p-1  rounded-0" placeholder=" عنوان السكن ">
                 </div>
-
               </td>
             </tr>
-
             <tr>
               <td>
                 <div class="form-group input-group-sm p-1 m-0">
@@ -108,14 +92,12 @@
                   <input type="text" required="required" name="city" value="<?php echo $op->setPosts("city"); ?>" class="form-control input-sm p-1  rounded-0" placeholder=" المدينة ">
                 </div>
               </td>
-
               <td>
                 <div class="form-group input-group-sm p-1 m-0">
                   <label> الدولة </label>
                   <input type="text" required="required" name="contry" value="<?php echo $op->setPosts("contry"); ?>" class="form-control input-sm p-1  rounded-0" placeholder=" الدولة ">
                 </div>
               </td>
-
               <td>
                 <div class="form-group input-group-sm p-1 m-0">
                   <label> الهواتف </label>
@@ -123,11 +105,8 @@
                 </div>
               </td>
               <td>
-
-
                 <label for="reg_Date"> تاريخ التسجيل </label>
                 <input type="date" name="reg_date" id="reg_date" class="form-control rounded-0 p-1 ">
-
               </td>
             </tr>
           </table>
@@ -136,36 +115,33 @@
     </div>
   </div>
   <input type="hidden" name="stu_pic" value="<?php echo $op->setPosts("stu_pic"); ?>" id="stu_pic" value="">
-
   <input type="hidden" name="u" value="<?php echo $_SESSION['ROOT_URL']; ?>" id="u">
-
 </form>
-
-
-
 <!-- Modal -->
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <h5 class="modal-title" id="exampleModalLongTitle"> فضلاً اختر الصورة </h5>
+          <h5 class="modal-title" id="exampleModalLongTitle">
+            اختر الصورة
 
+          </h5>
           <span aria-hidden="true">&times;</span>
         </button>
+        <span class="float-left">
+          <a href="<?php echo ROOT_URL; ?>/filemanager" class="btn primary-color-dark text-white p-1"> رفع صورة </a>
+        </span>
       </div>
       <div class="modal-body tab-pane">
         <?php show_images(); ?>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-danger rounded-0 ml-1" data-dismiss="modal"> اغلاق </button>
-
+        <button type="button" class="btn  danger-color-dark text-white px-3 py-2 rounded-0 ml-1" data-dismiss="modal"> اغلاق </button>
       </div>
     </div>
   </div>
 </div>
-
-
 <script>
   function reply_click(clicked_id) {
     var ps = document.getElementById("u").value + "/" + "uplouds/";

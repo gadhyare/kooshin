@@ -22,8 +22,9 @@
                 
             }
             else{
-            $this->query('UPDATE academics SET  academics= :academics_edit,active= :active_edit WHERE academics_id=:academics_id');
+            $this->query('UPDATE academics SET  academics= :academics_edit,code= :code_edit, active= :active_edit WHERE academics_id=:academics_id');
             $this->bind(':academics_edit' ,  $post['academics_edit']);
+            $this->bind(':code_edit',  $post['code_edit']);
             $this->bind(':active_edit' ,  $post['selected_value']);
             $this->bind(':academics_id' ,  $_GET['id']);
             $do_edit = $this->execute();
@@ -56,8 +57,9 @@
             }
             else{
 
-                $this->query('INSERT INTO academics( academics , active) VALUES (:academics,:active)');
+                $this->query('INSERT INTO academics( academics , code,  active) VALUES (:academics,:code , :active)');
                 $this->bind(':academics' , $post['academics_name']);
+                $this->bind(':code', $post['code']);
                 $this->bind(':active', $post['active']);
                 $this->execute();
                 if($this->lastInsertId()){
